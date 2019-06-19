@@ -211,10 +211,10 @@ func (e *Frame) IsDestroyed() bool {
 }
 
 // LerpPosition changes an element's position over duration
-func (e *Frame) LerpPosition(endPosition *common.Vector, duration time.Duration, isDestroyed bool, endFunc func()) {
+func (e *Frame) LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func()) {
 	e.lerpPosition.start = time.Now()
 	e.lerpPosition.startPosition = &common.Vector{X: e.shape.Min.X, Y: e.shape.Min.Y}
-	e.lerpPosition.endPosition = endPosition
+	e.lerpPosition.endPosition = &common.Vector{X: endPosition.X, Y: endPosition.Y}
 	e.lerpPosition.duration = duration
 	e.lerpPosition.isEnabled = true
 	e.lerpPosition.endFunc = endFunc
@@ -277,13 +277,14 @@ func (e *Frame) drawNinePatch(dst *ebiten.Image, dstRect *common.Rectangle, srcR
 	}
 }
 
-// ShapeRead returns an element's X/Y position as well as width/height
-func (e *Frame) ShapeRead() *common.Rectangle {
+// Shape returns an element's X/Y position as well as width/height
+func (e *Frame) Shape() *common.Rectangle {
 	return e.shape
 }
 
-// ShapeUpdate sets an element's X/Y position as well as width/height
-func (e *Frame) ShapeUpdate(shape *common.Rectangle) {
-	e.shape = shape
+// SetShape sets an element's X/Y position as well as width/height
+func (e *Frame) SetShape(shape common.Rectangle) {
+	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
+	e.shape = &newShape
 	return
 }

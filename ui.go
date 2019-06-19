@@ -3,6 +3,7 @@ package egui
 import (
 	"fmt"
 	"image"
+	"time"
 
 	// Used for decoding
 	_ "image/png"
@@ -42,6 +43,7 @@ type UI struct {
 	currentMap       string
 	screenResolution image.Point
 	images           map[string]*ebiten.Image
+	lastUpdate       time.Time
 }
 
 // NewUI instantiates a new User Interface
@@ -56,6 +58,7 @@ func NewUI(font font.Face, fontMHeight int, screenResolution image.Point) (*UI, 
 	gs := NewScene()
 	u.AddScene("global", gs)
 	u.globalScene = gs
+	u.currentScene = gs
 	return u, nil
 }
 
@@ -92,7 +95,21 @@ func (u *UI) Resource(name string) (*ebiten.Image, error) {
 }
 
 // Update updates all UI elements
-func (u *UI) Update(dt float64) {
+func (u *UI) Update(image *ebiten.Image) error {
+	dt := time.Since(u.lastUpdate).Seconds()
+
+	u.onUpdate(dt)
+
+	//graphical elements
+	if ebiten.IsDrawingSkipped() {
+		return nil
+	}
+
+	u.draw(image)
+	return nil
+}
+
+func (u *UI) onUpdate(dt float64) {
 	if u.globalScene != nil {
 		u.globalScene.update(dt)
 	}
@@ -102,7 +119,7 @@ func (u *UI) Update(dt float64) {
 }
 
 // Draw renders all UI elements
-func (u *UI) Draw(screen *ebiten.Image) {
+func (u *UI) draw(screen *ebiten.Image) {
 	if u.currentScene != nil {
 		u.currentScene.draw(screen)
 	}

@@ -36,14 +36,15 @@ type Label struct {
 }
 
 // NewLabel creates a new label instance
-func (u *UI) NewLabel(name string, text string, shape *common.Rectangle, color color.Color) (e *Label, err error) {
+func (u *UI) NewLabel(name string, text string, shape common.Rectangle, color color.Color) (e *Label, err error) {
 
 	if name == "" {
 		name = uuid.New().String()
 	}
+	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e = &Label{
 		name:         name,
-		shape:        shape,
+		shape:        &newShape,
 		text:         text,
 		isEnabled:    true,
 		isVisible:    true,
@@ -51,6 +52,10 @@ func (u *UI) NewLabel(name string, text string, shape *common.Rectangle, color c
 		lerpColor:    &lerpColor{},
 		color:        color,
 		font:         u.font,
+	}
+	err = u.currentScene.AddElement(e)
+	if err != nil {
+		return
 	}
 	return
 }
@@ -113,8 +118,7 @@ func (e *Label) update(dt float64) {
 	}
 
 	if e.lerpPosition.isEnabled {
-		//	e.shape.Min.X, e.shape.Min.Y = e.lerpPosition.Lerp()
-		//	e.shape.Max.Y = e.shape.Min.Y + 100
+		e.shape.Min.X, e.shape.Min.Y = e.lerpPosition.Lerp()
 		if !e.lerpPosition.isEnabled {
 			if e.lerpPosition.endFunc != nil {
 				e.lerpPosition.endFunc()
@@ -185,10 +189,10 @@ func (e *Label) LerpColor(endColor color.Color, duration time.Duration, isDestro
 }
 
 // LerpPosition changes an element's position over duration
-func (e *Label) LerpPosition(endPosition *common.Vector, duration time.Duration, isDestroyed bool, endFunc func()) {
+func (e *Label) LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func()) {
 	e.lerpPosition.start = time.Now()
 	e.lerpPosition.startPosition = &common.Vector{X: e.shape.Min.X, Y: e.shape.Min.Y}
-	e.lerpPosition.endPosition = endPosition
+	e.lerpPosition.endPosition = &common.Vector{X: endPosition.X, Y: endPosition.Y}
 	e.lerpPosition.duration = duration
 	e.lerpPosition.isEnabled = true
 	e.lerpPosition.endFunc = endFunc
@@ -200,13 +204,14 @@ func (e *Label) IsDestroyed() bool {
 	return e.isDestroyed
 }
 
-// ShapeRead returns an element's X/Y position as well as width/height
-func (e *Label) ShapeRead() *common.Rectangle {
+// Shape returns an element's X/Y position as well as width/height
+func (e *Label) Shape() *common.Rectangle {
 	return e.shape
 }
 
-// ShapeUpdate sets an element's X/Y position as well as width/height
-func (e *Label) ShapeUpdate(shape *common.Rectangle) {
-	e.shape = shape
+// SetShape sets an element's X/Y position as well as width/height
+func (e *Label) SetShape(shape common.Rectangle) {
+	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
+	e.shape = &newShape
 	return
 }

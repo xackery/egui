@@ -219,10 +219,10 @@ func (e *Button) IsDestroyed() bool {
 }
 
 // LerpPosition changes an element's position over duration
-func (e *Button) LerpPosition(endPosition *common.Vector, duration time.Duration, isDestroyed bool, endFunc func()) {
+func (e *Button) LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func()) {
 	e.lerpPosition.start = time.Now()
 	e.lerpPosition.startPosition = &common.Vector{X: e.shape.Min.X, Y: e.shape.Min.Y}
-	e.lerpPosition.endPosition = endPosition
+	e.lerpPosition.endPosition = &common.Vector{X: endPosition.X, Y: endPosition.Y}
 	e.lerpPosition.duration = duration
 	e.lerpPosition.isEnabled = true
 	e.lerpPosition.endFunc = endFunc
@@ -286,13 +286,14 @@ func (e *Button) drawNinePatch(dst *ebiten.Image, dstRect *common.Rectangle, src
 	}
 }
 
-// ShapeRead returns an element's X/Y position as well as width/height
-func (e *Button) ShapeRead() *common.Rectangle {
+// Shape returns an element's X/Y position as well as width/height
+func (e *Button) Shape() *common.Rectangle {
 	return e.shape
 }
 
-// ShapeUpdate sets an element's X/Y position as well as width/height
-func (e *Button) ShapeUpdate(shape *common.Rectangle) {
-	e.shape = shape
+// SetShape sets an element's X/Y position as well as width/height
+func (e *Button) SetShape(shape common.Rectangle) {
+	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
+	e.shape = &newShape
 	return
 }

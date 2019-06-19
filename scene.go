@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 // Scene represents a layout of ui
@@ -79,7 +80,6 @@ func (s *Scene) update(dt float64) {
 	if s.isElementsNextUpdateDirty {
 		s.elements = s.elementsNextUpdate
 		s.isElementsNextUpdateDirty = false
-		fmt.Println("updated elements", len(s.elements), "total")
 	}
 
 	for _, e := range s.elements {
@@ -97,6 +97,7 @@ func (s *Scene) draw(screen *ebiten.Image) {
 		}
 		e.draw(screen)
 	}
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %.0f, Elements: %d", ebiten.CurrentTPS(), len(s.elements)))
 }
 
 func (s *Scene) onResolutionChange(resolution image.Point) {

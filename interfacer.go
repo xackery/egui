@@ -21,10 +21,10 @@ type Interfacer interface {
 	RenderIndexRead() int64
 	RenderIndexUpdate(renderIndex int64)
 	IsDestroyed() bool
-	// ShapeRead returns the shape of an element
-	ShapeRead() *common.Rectangle
-	// ShapeUpdate sets the shape of an element
-	ShapeUpdate(shape *common.Rectangle)
-	LerpPosition(endPosition *common.Vector, duration time.Duration, isDestroyed bool, endFunc func())
+	// Shape returns the shape of an element
+	Shape() *common.Rectangle
+	// SetShape sets the shape of an element
+	SetShape(shape common.Rectangle)
+	LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func())
 	TextUpdate(string)
 }
