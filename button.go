@@ -16,7 +16,7 @@ import (
 // Button represents a UI Button element
 type Button struct {
 	name            string
-	defaultResource string
+	defaultImage    string
 	image           *ebiten.Image
 	shape           *common.Rectangle
 	text            string
@@ -33,18 +33,15 @@ type Button struct {
 	lerpPosition    *lerpPosition
 	lerpColor       *lerpColor
 	color           color.Color
-	//inherited by ui by default
-	font font.Face
-	//inherited by ui by default
-	fontMHeight int
+	font            *Font
 }
 
 // NewButton creates a new button instance
-func (u *UI) NewButton(name string, resourceName string, scene string, text string, shape *common.Rectangle, textColor color.Color) (*Button, error) {
-	if resourceName == "" {
-		return nil, ErrResourceNotFound
+func (u *UI) NewButton(name string, imageName string, scene string, text string, shape *common.Rectangle, textColor color.Color) (*Button, error) {
+	if imageName == "" {
+		return nil, ErrImageNotFound
 	}
-	img, err := u.Resource(resourceName)
+	img, err := u.Image(imageName)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +63,7 @@ func (u *UI) NewButton(name string, resourceName string, scene string, text stri
 		lerpColor:     &lerpColor{},
 		color:         textColor,
 		shape:         shape,
-		font:          u.font,
+		font:          u.defaultFont,
 	}
 
 	err = s.AddElement(e)
@@ -191,11 +188,11 @@ func (e *Button) draw(dst *ebiten.Image) {
 
 	e.drawNinePatch(dst, e.shape, common.RectImageCopy(srcRect))
 
-	bounds, _ := font.BoundString(e.font, e.text)
+	bounds, _ := font.BoundString(e.font.Face, e.text)
 	w := float64((bounds.Max.X - bounds.Min.X).Ceil())
 	x := e.shape.Min.X + (e.shape.Dx()-w)/2
-	y := e.shape.Max.Y - (e.shape.Dy()-float64(e.fontMHeight))/2
-	text.Draw(dst, e.text, e.font, int(x), int(y), e.color)
+	y := e.shape.Max.Y - (e.shape.Dy()-float64(e.font.Height))/2
+	text.Draw(dst, e.text, e.font.Face, int(x), int(y), e.color)
 }
 
 // TextUpdate changes the text on the button

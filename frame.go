@@ -30,8 +30,8 @@ type Frame struct {
 }
 
 // NewFrame creates a new Frame instance
-func (u *UI) NewFrame(name string, resourceName string, text string, shape *common.Rectangle) (e *Frame, err error) {
-	img, err := u.Resource(resourceName)
+func (u *UI) NewFrame(name string, imageName string, text string, shape *common.Rectangle) (e *Frame, err error) {
+	img, err := u.Image(imageName)
 	if err != nil {
 		return
 	}

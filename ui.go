@@ -9,7 +9,8 @@ import (
 	_ "image/png"
 
 	"github.com/hajimehoshi/ebiten"
-	"golang.org/x/image/font"
+	"github.com/pkg/errors"
+	"golang.org/x/image/font/gofont/goregular"
 )
 
 var (
@@ -19,12 +20,20 @@ var (
 	ErrElementAlreadyExists = fmt.Errorf("element already exists")
 	// ErrElementNotFound is returned when a element is not loaded into the UI
 	ErrElementNotFound = fmt.Errorf("element not found")
-	// ErrResourceNameInvalid is returned when a resource name has invalid characters or too short
-	ErrResourceNameInvalid = fmt.Errorf("resource name invalid")
-	// ErrResourceAlreadyExists is returned when a resource already exists
-	ErrResourceAlreadyExists = fmt.Errorf("resource already exists")
-	// ErrResourceNotFound is returned when a resource was not found
-	ErrResourceNotFound = fmt.Errorf("resource not found")
+	// ErrFontNameInvalid is returned when a font name has invalid characters or too short
+	ErrFontNameInvalid = fmt.Errorf("font name invalid")
+	// ErrFontAlreadyExists is returned when a font already exists
+	ErrFontAlreadyExists = fmt.Errorf("font already exists")
+	// ErrFontNotFound is returned when a font was not found
+	ErrFontNotFound = fmt.Errorf("font not found")
+	// ErrFontCannotRemoveDefault is returned when you attempt to delete a font currently set as default
+	ErrFontCannotRemoveDefault = fmt.Errorf("font is default, cannot remove")
+	// ErrImageNameInvalid is returned when a image name has invalid characters or too short
+	ErrImageNameInvalid = fmt.Errorf("image name invalid")
+	// ErrImageAlreadyExists is returned when a image already exists
+	ErrImageAlreadyExists = fmt.Errorf("image already exists")
+	// ErrImageNotFound is returned when a image was not found
+	ErrImageNotFound = fmt.Errorf("image not found")
 	// ErrSceneNameInvalid is returned when a scene name has invalid characters or too short
 	ErrSceneNameInvalid = fmt.Errorf("scene name invalid")
 	// ErrSceneAlreadyExists is returned when a Scene already exists
@@ -35,30 +44,35 @@ var (
 
 // UI contains core game components
 type UI struct {
-	font             font.Face
-	fontMHeight      int
+	defaultFont      *Font
 	scenes           map[string]*Scene
 	currentScene     *Scene
 	globalScene      *Scene
 	currentMap       string
 	screenResolution image.Point
 	images           map[string]*ebiten.Image
+	fonts            map[string]*Font
 	lastUpdate       time.Time
 }
 
 // NewUI instantiates a new User Interface
-func NewUI(font font.Face, fontMHeight int, screenResolution image.Point) (*UI, error) {
+func NewUI(screenResolution image.Point) (*UI, error) {
 	u := &UI{
-		font:             font,
-		fontMHeight:      fontMHeight,
 		scenes:           make(map[string]*Scene),
 		images:           make(map[string]*ebiten.Image),
+		fonts:            make(map[string]*Font),
 		screenResolution: screenResolution,
 	}
 	gs := NewScene()
 	u.AddScene("global", gs)
 	u.globalScene = gs
 	u.currentScene = gs
+
+	var err error
+	u.defaultFont, err = u.NewFontTTF("goregular", goregular.TTF, nil, 'M')
+	if err != nil {
+		return nil, errors.Wrap(err, "goregular font")
+	}
 	return u, nil
 }
 
@@ -75,21 +89,21 @@ func (u *UI) Resolution() image.Point {
 	return u.screenResolution
 }
 
-// AddResource adds an image resource to ui
-func (u *UI) AddResource(name string, img *ebiten.Image) error {
+// AddImage adds an image image to ui
+func (u *UI) AddImage(name string, img *ebiten.Image) error {
 	_, ok := u.images[name]
 	if !ok {
-		return ErrResourceAlreadyExists
+		return ErrImageAlreadyExists
 	}
 	u.images[name] = img
 	return nil
 }
 
-// Resource returns named resource
-func (u *UI) Resource(name string) (*ebiten.Image, error) {
+// Image returns named image
+func (u *UI) Image(name string) (*ebiten.Image, error) {
 	img, ok := u.images[name]
 	if !ok {
-		return nil, ErrResourceNotFound
+		return nil, ErrImageNotFound
 	}
 	return img, nil
 }
@@ -161,4 +175,57 @@ func (u *UI) Scene(name string) (*Scene, error) {
 		return nil, ErrSceneNotFound
 	}
 	return scene, nil
+}
+
+// SetDefaultFont updates all elements to use a new default font
+func (u *UI) SetDefaultFont(name string) error {
+	font, ok := u.fonts[name]
+	if !ok {
+		return ErrFontNotFound
+	}
+	u.defaultFont = font
+	return nil
+}
+
+// DefaultFont returns the current default font
+func (u *UI) DefaultFont(name string) error {
+	font, ok := u.fonts[name]
+	if !ok {
+		return ErrFontNotFound
+	}
+	u.defaultFont = font
+	return nil
+}
+
+// AddFont adds an font font to ui
+func (u *UI) AddFont(font *Font) error {
+	if font == nil {
+		return ErrFontNameInvalid
+	}
+	_, ok := u.fonts[font.Name]
+	if ok {
+		return ErrFontAlreadyExists
+	}
+	u.fonts[font.Name] = font
+	return nil
+}
+
+// Font returns named font
+func (u *UI) Font(name string) (*Font, error) {
+	img, ok := u.fonts[name]
+	if !ok {
+		return nil, ErrFontNotFound
+	}
+	return img, nil
+}
+
+// RemoveFont is used to unload and remove a font
+func (u *UI) RemoveFont(font *Font) error {
+	if font == nil {
+		return ErrFontNameInvalid
+	}
+	if u.defaultFont.Name == font.Name {
+		return ErrFontCannotRemoveDefault
+	}
+	return nil
 }

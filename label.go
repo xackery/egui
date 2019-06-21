@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/xackery/egui/common"
-	"golang.org/x/image/font"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/text"
@@ -29,10 +28,7 @@ type Label struct {
 	onPressed       func(e *Label)
 	onPressFunction func()
 	renderIndex     int64
-	//inherited by ui by default
-	font font.Face
-	//inherited by ui by default
-	fontMHeight int
+	font            *Font
 }
 
 // NewLabel creates a new label instance
@@ -51,7 +47,7 @@ func (u *UI) NewLabel(name string, text string, shape common.Rectangle, color co
 		lerpPosition: &lerpPosition{},
 		lerpColor:    &lerpColor{},
 		color:        color,
-		font:         u.font,
+		font:         u.defaultFont,
 	}
 	err = u.currentScene.AddElement(e)
 	if err != nil {
@@ -159,7 +155,7 @@ func (e *Label) draw(dst *ebiten.Image) {
 	//w := float64((bounds.Max.X - bounds.Min.X).Ceil())
 	x := e.shape.Min.X //+ (e.shape.Dx()-w)/2
 	y := e.shape.Min.Y //- (e.shape.Dy()-float64(uiInstance.fontMHeight))/2
-	text.Draw(dst, e.text, e.font, int(x), int(y), e.color)
+	text.Draw(dst, e.text, e.font.Face, int(x), int(y), e.color)
 }
 
 // TextUpdate changes the text on the label
