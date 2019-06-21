@@ -28,7 +28,7 @@ func (s *Scene) Element(name string) (Interfacer, error) {
 		return nil, ErrElementNameInvalid
 	}
 	for _, se := range s.elementsNextUpdate {
-		if se.NameRead() != name {
+		if se.Name() != name {
 			continue
 		}
 		return se, nil
@@ -38,11 +38,11 @@ func (s *Scene) Element(name string) (Interfacer, error) {
 
 // AddElement adds an element to the scene list
 func (s *Scene) AddElement(e Interfacer) error {
-	if e.NameRead() == "" {
+	if e.Name() == "" {
 		return ErrElementNotFound
 	}
 	for _, se := range s.elementsNextUpdate {
-		if se.NameRead() != e.NameRead() {
+		if se.Name() != e.Name() {
 			continue
 		}
 		return ErrElementAlreadyExists
@@ -60,7 +60,7 @@ func (s *Scene) RemoveElement(name string) error {
 	}
 	var isFound bool
 	for i := range s.elementsNextUpdate {
-		if s.elementsNextUpdate[i].NameRead() != name {
+		if s.elementsNextUpdate[i].Name() != name {
 			continue
 		}
 		isFound = true
@@ -85,7 +85,7 @@ func (s *Scene) update(dt float64) {
 	for _, e := range s.elements {
 		e.update(dt)
 		if e.IsDestroyed() {
-			s.RemoveElement(e.NameRead())
+			s.RemoveElement(e.Name())
 		}
 	}
 }

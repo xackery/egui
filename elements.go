@@ -14,5 +14,5 @@ func (e elements) Swap(i, j int) {
 
 // Less is part of sort.Interface. We use count as the value to sort by
 func (e elements) Less(i, j int) bool {
-	return e[i].RenderIndexRead() < e[j].RenderIndexRead()
+	return e[i].RenderIndex() < e[j].RenderIndex()
 }

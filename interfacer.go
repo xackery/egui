@@ -10,21 +10,21 @@ import (
 // Interfacer is a generic user interface wrapper
 type Interfacer interface {
 	//TargetPositionUpdate(tp *common.Vector, duration time.Duration)
-	EnabledRead() bool
-	EnabledUpdate(isEnabled bool)
-	VisibleRead() bool
-	VisibleUpdate(isVisible bool)
-	update(dt float64)
+	IsEnabled() bool
+	SetEnabled(isEnabled bool)
 	IsVisible() bool
+	SetVisible(isVisible bool)
+	update(dt float64)
 	draw(screen *ebiten.Image)
-	NameRead() string
-	RenderIndexRead() int64
-	RenderIndexUpdate(renderIndex int64)
+	Name() string
+	RenderIndex() int64
+	SetRenderIndex(renderIndex int64)
 	IsDestroyed() bool
+	SetIsDestroyed(isDestroyed bool)
+	SetText(text string)
 	// Shape returns the shape of an element
 	Shape() *common.Rectangle
 	// SetShape sets the shape of an element
 	SetShape(shape common.Rectangle)
 	LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func())
-	TextUpdate(string)
 }

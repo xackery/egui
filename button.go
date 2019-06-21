@@ -73,55 +73,40 @@ func (u *UI) NewButton(name string, imageName string, scene string, text string,
 	return e, nil
 }
 
-// NameRead returns a mob's name
-func (e *Button) NameRead() string {
+// Name returns a mob's name
+func (e *Button) Name() string {
 	return e.name
 }
 
 // IsVisible returns true if mob is visible
 func (e *Button) IsVisible() bool {
-	return e.VisibleRead()
+	return e.isVisible
 }
 
-// AlignmentUpdate changes the alignment of the element
-func (e *Button) AlignmentUpdate(alignment int) {
-	e.alignment = alignment
-}
-
-// AlignmentRead returns the alignment style
-func (e *Button) AlignmentRead() int {
-	return e.alignment
-}
-
-// EnabledRead returns true if a button is enabled
-func (e *Button) EnabledRead() bool {
+// IsEnabled returns true if a button is enabled
+func (e *Button) IsEnabled() bool {
 	return e.isEnabled
 }
 
-// EnabledUpdate changes if a button is enabled
-func (e *Button) EnabledUpdate(isEnabled bool) {
+// SetEnabled changes if a button is enabled
+func (e *Button) SetEnabled(isEnabled bool) {
 	e.isEnabled = isEnabled
 	return
 }
 
-// VisibleRead returns true if a button is visible
-func (e *Button) VisibleRead() bool {
-	return e.isVisible
-}
-
-// VisibleUpdate changes the visibility of a button
-func (e *Button) VisibleUpdate(isVisible bool) {
+// SetVisible changes the visibility of a button
+func (e *Button) SetVisible(isVisible bool) {
 	e.isVisible = isVisible
 	return
 }
 
-// RenderIndexRead returns the render index of element
-func (e *Button) RenderIndexRead() int64 {
+// RenderIndex returns the render index of element
+func (e *Button) RenderIndex() int64 {
 	return e.renderIndex
 }
 
-// RenderIndexUpdate sets the render index of element
-func (e *Button) RenderIndexUpdate(renderIndex int64) {
+// SetRenderIndex sets the render index of element
+func (e *Button) SetRenderIndex(renderIndex int64) {
 	e.renderIndex = renderIndex
 }
 
@@ -195,8 +180,8 @@ func (e *Button) draw(dst *ebiten.Image) {
 	text.Draw(dst, e.text, e.font.Face, int(x), int(y), e.color)
 }
 
-// TextUpdate changes the text on the button
-func (e *Button) TextUpdate(text string) {
+// SetText changes the text on the button
+func (e *Button) SetText(text string) {
 	e.text = text
 }
 
@@ -292,5 +277,11 @@ func (e *Button) Shape() *common.Rectangle {
 func (e *Button) SetShape(shape common.Rectangle) {
 	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e.shape = &newShape
+	return
+}
+
+// SetIsDestroyed sets an element to be destroyed on next update
+func (e *Button) SetIsDestroyed(isDestroyed bool) {
+	e.isDestroyed = true
 	return
 }

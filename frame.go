@@ -50,55 +50,34 @@ func (u *UI) NewFrame(name string, imageName string, text string, shape *common.
 	return
 }
 
-// NameRead returns a mob's name
-func (e *Frame) NameRead() string {
+// Name returns a mob's name
+func (e *Frame) Name() string {
 	return e.name
 }
 
 // IsVisible returns true if mob is visible
 func (e *Frame) IsVisible() bool {
-	return e.VisibleRead()
-}
-
-// RenderIndexRead returns the render index of element
-func (e *Frame) RenderIndexRead() int64 {
-	return e.renderIndex
-}
-
-// RenderIndexUpdate sets the render index of element
-func (e *Frame) RenderIndexUpdate(renderIndex int64) {
-	e.renderIndex = renderIndex
-}
-
-// AlignmentUpdate changes the alignment of the element
-func (e *Frame) AlignmentUpdate(alignment int) {
-	e.alignment = alignment
-}
-
-// AlignmentRead returns the alignment style
-func (e *Frame) AlignmentRead() int {
-	return e.alignment
-}
-
-// EnabledRead returns true if a Frame is enabled
-func (e *Frame) EnabledRead() bool {
-	return e.isEnabled
-}
-
-// EnabledUpdate changes if a Frame is enabled
-func (e *Frame) EnabledUpdate(isEnabled bool) {
-	e.isEnabled = isEnabled
-	return
-}
-
-// VisibleRead returns true if a Frame is visible
-func (e *Frame) VisibleRead() bool {
 	return e.isVisible
 }
 
-// VisibleUpdate changes the visibility of a Frame
-func (e *Frame) VisibleUpdate(isVisible bool) {
-	e.isVisible = isVisible
+// RenderIndex returns the render index of element
+func (e *Frame) RenderIndex() int64 {
+	return e.renderIndex
+}
+
+// SetRenderIndex sets the render index of element
+func (e *Frame) SetRenderIndex(renderIndex int64) {
+	e.renderIndex = renderIndex
+}
+
+// IsEnabled returns true if a Frame is enabled
+func (e *Frame) IsEnabled() bool {
+	return e.isEnabled
+}
+
+// SetIsEnabled changes if a Frame is enabled
+func (e *Frame) SetIsEnabled(isEnabled bool) {
+	e.isEnabled = isEnabled
 	return
 }
 
@@ -134,8 +113,8 @@ func (e *Frame) draw(dst *ebiten.Image) {
 		text.Draw(dst, e.text, uiInstance.font, int(x), int(y), color.White)*/
 }
 
-// TextUpdate changes the text on the Frame
-func (e *Frame) TextUpdate(text string) {
+// SetText changes the text on the Frame
+func (e *Frame) SetText(text string) {
 	e.text = text
 }
 
@@ -286,5 +265,11 @@ func (e *Frame) Shape() *common.Rectangle {
 func (e *Frame) SetShape(shape common.Rectangle) {
 	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e.shape = &newShape
+	return
+}
+
+// SetIsDestroyed sets an element to be destroyed on next update
+func (e *Frame) SetIsDestroyed(isDestroyed bool) {
+	e.isDestroyed = true
 	return
 }

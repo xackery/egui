@@ -42,5 +42,5 @@ func main() {
 func randomBounce() {
 	x := float64(rand.Intn(screenResolution.X - int(lblHello.Shape().Max.X)))
 	y := float64(rand.Intn(screenResolution.Y - int(lblHello.Shape().Max.Y)))
-	lblHello.LerpPosition(common.Vect(x, y), 1*time.Second, false, randomBounce)
+	lblHello.LerpPosition(common.Vect(x, y), 3*time.Second, false, randomBounce)
 }

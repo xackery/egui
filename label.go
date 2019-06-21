@@ -56,45 +56,40 @@ func (u *UI) NewLabel(name string, text string, shape common.Rectangle, color co
 	return
 }
 
-// NameRead returns an element's name
-func (e *Label) NameRead() string {
+// Name returns an element's name
+func (e *Label) Name() string {
 	return e.name
 }
 
 // IsVisible returns true if element should be shown
 func (e *Label) IsVisible() bool {
-	return e.VisibleRead()
+	return e.isVisible
 }
 
-// EnabledRead returns true if a button is enabled
-func (e *Label) EnabledRead() bool {
+// IsEnabled returns true if a button is enabled
+func (e *Label) IsEnabled() bool {
 	return e.isEnabled
 }
 
-// EnabledUpdate changes if a button is enabled
-func (e *Label) EnabledUpdate(isEnabled bool) {
+// SetEnabled changes if a button is enabled
+func (e *Label) SetEnabled(isEnabled bool) {
 	e.isEnabled = isEnabled
 	return
 }
 
-// VisibleRead returns true if a button is visible
-func (e *Label) VisibleRead() bool {
-	return e.isVisible
-}
-
-// VisibleUpdate changes the visibility of a button
-func (e *Label) VisibleUpdate(isVisible bool) {
+// SetVisible changes the visibility of a button
+func (e *Label) SetVisible(isVisible bool) {
 	e.isVisible = isVisible
 	return
 }
 
-// RenderIndexRead returns the render index of element
-func (e *Label) RenderIndexRead() int64 {
+// RenderIndex returns the render index of element
+func (e *Label) RenderIndex() int64 {
 	return e.renderIndex
 }
 
-// RenderIndexUpdate sets the render index of element
-func (e *Label) RenderIndexUpdate(renderIndex int64) {
+// SetRenderIndex sets the render index of element
+func (e *Label) SetRenderIndex(renderIndex int64) {
 	e.renderIndex = renderIndex
 }
 
@@ -158,8 +153,8 @@ func (e *Label) draw(dst *ebiten.Image) {
 	text.Draw(dst, e.text, e.font.Face, int(x), int(y), e.color)
 }
 
-// TextUpdate changes the text on the label
-func (e *Label) TextUpdate(text string) {
+// SetText changes the text on the label
+func (e *Label) SetText(text string) {
 	e.text = text
 }
 
@@ -209,5 +204,11 @@ func (e *Label) Shape() *common.Rectangle {
 func (e *Label) SetShape(shape common.Rectangle) {
 	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e.shape = &newShape
+	return
+}
+
+// SetIsDestroyed sets an element to be destroyed on next update
+func (e *Label) SetIsDestroyed(isDestroyed bool) {
+	e.isDestroyed = true
 	return
 }
