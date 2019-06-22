@@ -1,17 +1,15 @@
 package egui
 
 import (
-	"image"
 	"image/color"
 	"time"
-
-	"golang.org/x/image/font"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/inpututil"
 	"github.com/hajimehoshi/ebiten/text"
 	"github.com/pkg/errors"
 	"github.com/xackery/egui/common"
+	"golang.org/x/image/font"
 )
 
 // Button represents a UI Button element
@@ -35,6 +33,8 @@ type Button struct {
 	font               *Font
 	pressedSliceName   string
 	unpressedSliceName string
+	ui                 *UI
+	isTextShadow       bool
 }
 
 // NewButton creates a new button instance
@@ -167,14 +167,67 @@ func (e *Button) update(dt float64) {
 
 // Draw is called during a game update
 func (e *Button) draw(dst *ebiten.Image) {
+	if !e.isVisible {
+		return
+	}
+	sliceName := e.unpressedSliceName
+	if e.isPressed {
+		sliceName = e.pressedSliceName
+	}
+	slice, err := e.image.Slice(sliceName)
+	if err != nil {
+		//fmt.Println("slice", sliceName, "not found", err)
+		//TODO: handle this error elegantly
+		return
+	}
 
-	e.drawNinePatch(dst)
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(e.X(), e.Y())
+	op.GeoM.Scale(1, 1)
 
+	//opacity := uint8(255)
+
+	if !e.isEnabled {
+		op.ColorM.ChangeHSV(0, 0, 1)
+		op.ColorM.Scale(0.5, 0.5, 0.5, 1)
+	}
+	DrawNineSlicing(dst, e.image.ebitenImage, slice.Keys[0], int(e.shape.Dx()), int(e.shape.Dy()), &op.GeoM, &op.ColorM)
+	//bounds, _ := font.BoundString(e.font.Face, e.text)
+	//w := float64((bounds.Max.X - bounds.Min.X).Ceil())
+	//text.Draw(dst, e.text, e.font.Face, int(e.X()), int(e.Y()), e.color)
 	bounds, _ := font.BoundString(e.font.Face, e.text)
 	w := float64((bounds.Max.X - bounds.Min.X).Ceil())
 	x := e.shape.Min.X + (e.shape.Dx()-w)/2
 	y := e.shape.Max.Y - (e.shape.Dy()-float64(e.font.Height))/2
 	text.Draw(dst, e.text, e.font.Face, int(x), int(y), e.color)
+
+	/*_, th := e.font.MeasureSize(e.text)
+	tx := e.X() * e.ui.tileScale
+	tx += e.shape.Dx() * e.ui.tileScale / 2
+
+	ty := e.Y() * e.ui.tileScale
+	ty += (e.shape.Dy()*e.ui.tileScale - float64(th)*e.ui.textScale) / 2
+
+	cr, cg, cb, ca := e.color.RGBA()
+	r8 := uint8(cr >> 8)
+	g8 := uint8(cg >> 8)
+	b8 := uint8(cb >> 8)
+	a8 := uint8(ca >> 8)
+	var c color.Color = color.RGBA{r8, g8, b8, uint8(uint16(a8) * uint16(opacity) / 255)}
+	if !e.isEnabled {
+		c = color.RGBA{r8, g8, b8, uint8(uint16(a8) * uint16(opacity) / (2 * 255))}
+	}
+	l := e.font.Language
+	if l == language.Und {
+		l = e.ui.defaultLanguage
+	}
+	if e.isTextShadow {
+		e.font.DrawText(dst, e.text, tx+e.ui.textScale, ty+e.ui.textScale, e.ui.textScale, 0, color.Black, len([]rune(e.text)))
+	}
+	e.font.DrawText(dst, e.text, tx, ty, e.ui.textScale, 0, c, len([]rune(e.text)))
+	*/
+
+	return
 }
 
 // SetText changes the text on the button
@@ -208,75 +261,6 @@ func (e *Button) LerpPosition(endPosition common.Vector, duration time.Duration,
 	e.lerpPosition.isDestroyed = isDestroyed
 }
 
-func (e *Button) drawNinePatch(dst *ebiten.Image) {
-
-	sliceName := e.unpressedSliceName
-	if e.isPressed {
-		sliceName = e.pressedSliceName
-	}
-	slice, err := e.image.Slice(sliceName)
-	if err != nil {
-		//fmt.Println("slice", sliceName, "not found", err)
-		//TODO: handle this error elegantly
-		return
-	}
-
-	srcX := slice.Keys[0].X
-	srcY := slice.Keys[0].Y
-	srcW := slice.Keys[0].W
-	srcH := slice.Keys[0].H
-
-	dstX := e.shape.Min.X
-	dstY := e.shape.Min.Y
-	dstW := e.shape.Dx()
-	dstH := e.shape.Dy()
-
-	op := &ebiten.DrawImageOptions{}
-	for j := 0; j < 3; j++ {
-		for i := 0; i < 3; i++ {
-			op.GeoM.Reset()
-			sx := srcX
-			sy := srcY
-			sw := srcW / 4
-			sh := srcH / 4
-			dx := float64(0)
-			dy := float64(0)
-			dw := sw
-			dh := sh
-			switch i {
-			case 1:
-				sx = srcX + srcW/3
-				sw = srcW / 3
-				dx = srcW / 4
-				dw = dstW - 2*srcW/4
-			case 2:
-				sx = srcX + 3*srcW/4
-				dx = dstW - srcW/4
-			}
-			switch j {
-			case 1:
-				sy = srcY + srcH/4
-				sh = srcH / 2
-				dy = srcH / 4
-				dh = dstH - 2*srcH/4
-			case 2:
-				sy = srcY + 3*srcH/4
-				dy = dstH - srcH/4
-			}
-
-			op.GeoM.Scale(float64(dw)/float64(sw), float64(dh)/float64(sh))
-
-			op.GeoM.Translate(float64(dx), float64(dy))
-			op.GeoM.Translate(float64(dstX), float64(dstY))
-			r := image.Rect(int(sx), int(sy), int(sx+sw), int(sy+sh))
-			op.SourceRect = &r
-			op.GeoM.Translate(e.shape.Min.X, e.shape.Min.Y)
-
-			dst.DrawImage(e.image.ebitenImage, op)
-		}
-	}
-}
-
 // Shape returns an element's X/Y position as well as width/height
 func (e *Button) Shape() *common.Rectangle {
 	return e.shape
@@ -293,4 +277,14 @@ func (e *Button) SetShape(shape common.Rectangle) {
 func (e *Button) SetIsDestroyed(isDestroyed bool) {
 	e.isDestroyed = true
 	return
+}
+
+// X returns the X position of a button
+func (e *Button) X() float64 {
+	return e.shape.Min.X
+}
+
+// Y returns the Y position of a button
+func (e *Button) Y() float64 {
+	return e.shape.Min.Y
 }

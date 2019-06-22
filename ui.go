@@ -11,6 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/pkg/errors"
 	"golang.org/x/image/font/gofont/goregular"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -53,15 +54,21 @@ type UI struct {
 	images           map[string]*Image
 	fonts            map[string]*Font
 	lastUpdate       time.Time
+	tileScale        float64
+	textScale        float64
+	defaultLanguage  language.Tag
 }
 
 // NewUI instantiates a new User Interface
-func NewUI(screenResolution image.Point) (*UI, error) {
+func NewUI(screenResolution image.Point, scale float64) (*UI, error) {
 	u := &UI{
 		scenes:           make(map[string]*Scene),
 		images:           make(map[string]*Image),
 		fonts:            make(map[string]*Font),
 		screenResolution: screenResolution,
+		tileScale:        1,
+		textScale:        1,
+		defaultLanguage:  language.AmericanEnglish,
 	}
 	gs := NewScene()
 	u.AddScene("global", gs)

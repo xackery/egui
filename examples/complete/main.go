@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"math/rand"
 	"os"
 	"time"
@@ -21,7 +22,7 @@ var (
 
 func main() {
 
-	ui, err := egui.NewUI(screenResolution)
+	ui, err := egui.NewUI(screenResolution, 1)
 	if err != nil {
 		fmt.Println("failed to start ui:", err.Error())
 		return
@@ -63,11 +64,15 @@ func main() {
 		}
 	}
 
-	_, err = ui.NewButton("btnTest", "global", "Hello!", common.Rect(0, 10, 100, 40), colornames.Blue, "ui", "btnPress", "btnUnpress")
+	btnHello, err := ui.NewButton("btnTest", "global", "Hello!", common.Rect(50, 50, 100, 80), color.White, "ui", "btnPress", "btnUnpress")
 	if err != nil {
 		fmt.Println("failed to create btnTest", err.Error())
 		return
 	}
+	btnHello.SetOnPressFunction(func() {
+		fmt.Println("pressed", btnHello.Name())
+	})
+
 	lblHello, err = ui.NewLabel("lblHello", "Hello, World!", common.Rect(100, 100, 100, 20), colornames.Yellow)
 	if err != nil {
 		fmt.Println("failed to create lblHello", err.Error())

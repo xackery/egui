@@ -1,12 +1,10 @@
 package egui
 
 import (
-	"fmt"
 	"image"
 	"sort"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 // Scene represents a layout of ui
@@ -97,7 +95,6 @@ func (s *Scene) draw(screen *ebiten.Image) {
 		}
 		e.draw(screen)
 	}
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %.0f, Elements: %d", ebiten.CurrentTPS(), len(s.elements)))
 }
 
 func (s *Scene) onResolutionChange(resolution image.Point) {

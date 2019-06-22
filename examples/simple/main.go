@@ -18,7 +18,7 @@ func main() {
 }
 
 func run() error {
-	ui, err := egui.NewUI(image.Point{X: 640, Y: 480})
+	ui, err := egui.NewUI(image.Point{X: 640, Y: 480}, 1)
 	if err != nil {
 		return errors.Wrap(err, "start ui")
 	}
