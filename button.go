@@ -10,40 +10,41 @@ import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/inpututil"
 	"github.com/hajimehoshi/ebiten/text"
+	"github.com/pkg/errors"
 	"github.com/xackery/egui/common"
 )
 
 // Button represents a UI Button element
 type Button struct {
-	name            string
-	defaultImage    string
-	image           *ebiten.Image
-	shape           *common.Rectangle
-	text            string
-	pressedRect     image.Rectangle
-	unpressedRect   image.Rectangle
-	isEnabled       bool
-	isVisible       bool
-	alignment       int
-	isPressed       bool
-	onPressed       func(e *Button)
-	onPressFunction func()
-	renderIndex     int64
-	isDestroyed     bool
-	lerpPosition    *lerpPosition
-	lerpColor       *lerpColor
-	color           color.Color
-	font            *Font
+	name               string
+	defaultImage       string
+	image              *Image
+	shape              *common.Rectangle
+	text               string
+	isEnabled          bool
+	isVisible          bool
+	alignment          int
+	isPressed          bool
+	onPressed          func(e *Button)
+	onPressFunction    func()
+	renderIndex        int64
+	isDestroyed        bool
+	lerpPosition       *lerpPosition
+	lerpColor          *lerpColor
+	color              color.Color
+	font               *Font
+	pressedSliceName   string
+	unpressedSliceName string
 }
 
 // NewButton creates a new button instance
-func (u *UI) NewButton(name string, imageName string, scene string, text string, shape *common.Rectangle, textColor color.Color) (*Button, error) {
+func (u *UI) NewButton(name string, scene string, text string, shape common.Rectangle, textColor color.Color, imageName string, pressedSliceName string, unpressedSliceName string) (*Button, error) {
 	if imageName == "" {
 		return nil, ErrImageNotFound
 	}
 	img, err := u.Image(imageName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, imageName)
 	}
 
 	s, err := u.Scene(scene)
@@ -51,19 +52,20 @@ func (u *UI) NewButton(name string, imageName string, scene string, text string,
 		return nil, ErrSceneNotFound
 	}
 
+	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e := &Button{
-		name:          name,
-		image:         img,
-		pressedRect:   image.Rect(16, 0, 32, 16),
-		unpressedRect: image.Rect(0, 0, 16, 16),
-		text:          text,
-		isEnabled:     true,
-		isVisible:     true,
-		lerpPosition:  &lerpPosition{},
-		lerpColor:     &lerpColor{},
-		color:         textColor,
-		shape:         shape,
-		font:          u.defaultFont,
+		name:               name,
+		image:              img,
+		text:               text,
+		isEnabled:          true,
+		isVisible:          true,
+		lerpPosition:       &lerpPosition{},
+		lerpColor:          &lerpColor{},
+		color:              textColor,
+		shape:              &newShape,
+		font:               u.defaultFont,
+		pressedSliceName:   pressedSliceName,
+		unpressedSliceName: unpressedSliceName,
 	}
 
 	err = s.AddElement(e)
@@ -166,12 +168,7 @@ func (e *Button) update(dt float64) {
 // Draw is called during a game update
 func (e *Button) draw(dst *ebiten.Image) {
 
-	srcRect := e.unpressedRect
-	if e.isPressed {
-		srcRect = e.pressedRect
-	}
-
-	e.drawNinePatch(dst, e.shape, common.RectImageCopy(srcRect))
+	e.drawNinePatch(dst)
 
 	bounds, _ := font.BoundString(e.font.Face, e.text)
 	w := float64((bounds.Max.X - bounds.Min.X).Ceil())
@@ -211,17 +208,28 @@ func (e *Button) LerpPosition(endPosition common.Vector, duration time.Duration,
 	e.lerpPosition.isDestroyed = isDestroyed
 }
 
-func (e *Button) drawNinePatch(dst *ebiten.Image, dstRect *common.Rectangle, srcRect *common.Rectangle) {
+func (e *Button) drawNinePatch(dst *ebiten.Image) {
 
-	srcX := srcRect.Min.X
-	srcY := srcRect.Min.Y
-	srcW := srcRect.Dx()
-	srcH := srcRect.Dy()
+	sliceName := e.unpressedSliceName
+	if e.isPressed {
+		sliceName = e.pressedSliceName
+	}
+	slice, err := e.image.Slice(sliceName)
+	if err != nil {
+		//fmt.Println("slice", sliceName, "not found", err)
+		//TODO: handle this error elegantly
+		return
+	}
 
-	dstX := dstRect.Min.X
-	dstY := dstRect.Min.Y
-	dstW := dstRect.Dx()
-	dstH := dstRect.Dy()
+	srcX := slice.Keys[0].X
+	srcY := slice.Keys[0].Y
+	srcW := slice.Keys[0].W
+	srcH := slice.Keys[0].H
+
+	dstX := e.shape.Min.X
+	dstY := e.shape.Min.Y
+	dstW := e.shape.Dx()
+	dstH := e.shape.Dy()
 
 	op := &ebiten.DrawImageOptions{}
 	for j := 0; j < 3; j++ {
@@ -257,13 +265,14 @@ func (e *Button) drawNinePatch(dst *ebiten.Image, dstRect *common.Rectangle, src
 			}
 
 			op.GeoM.Scale(float64(dw)/float64(sw), float64(dh)/float64(sh))
+
 			op.GeoM.Translate(float64(dx), float64(dy))
 			op.GeoM.Translate(float64(dstX), float64(dstY))
 			r := image.Rect(int(sx), int(sy), int(sx+sw), int(sy+sh))
 			op.SourceRect = &r
 			op.GeoM.Translate(e.shape.Min.X, e.shape.Min.Y)
 
-			dst.DrawImage(e.image, op)
+			dst.DrawImage(e.image.ebitenImage, op)
 		}
 	}
 }

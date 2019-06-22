@@ -50,7 +50,7 @@ type UI struct {
 	globalScene      *Scene
 	currentMap       string
 	screenResolution image.Point
-	images           map[string]*ebiten.Image
+	images           map[string]*Image
 	fonts            map[string]*Font
 	lastUpdate       time.Time
 }
@@ -59,7 +59,7 @@ type UI struct {
 func NewUI(screenResolution image.Point) (*UI, error) {
 	u := &UI{
 		scenes:           make(map[string]*Scene),
-		images:           make(map[string]*ebiten.Image),
+		images:           make(map[string]*Image),
 		fonts:            make(map[string]*Font),
 		screenResolution: screenResolution,
 	}
@@ -90,17 +90,20 @@ func (u *UI) Resolution() image.Point {
 }
 
 // AddImage adds an image image to ui
-func (u *UI) AddImage(name string, img *ebiten.Image) error {
-	_, ok := u.images[name]
-	if !ok {
+func (u *UI) AddImage(img *Image) error {
+	if img.Name() == "" {
+		return ErrImageNameInvalid
+	}
+	_, ok := u.images[img.Name()]
+	if ok {
 		return ErrImageAlreadyExists
 	}
-	u.images[name] = img
+	u.images[img.Name()] = img
 	return nil
 }
 
-// Image returns named image
-func (u *UI) Image(name string) (*ebiten.Image, error) {
+// Image returns a named image
+func (u *UI) Image(name string) (*Image, error) {
 	img, ok := u.images[name]
 	if !ok {
 		return nil, ErrImageNotFound

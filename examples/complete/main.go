@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"image"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/xackery/egui"
+	"github.com/xackery/egui/aseprite"
 	"github.com/xackery/egui/common"
 	"golang.org/x/image/colornames"
 )
@@ -24,13 +26,53 @@ func main() {
 		fmt.Println("failed to start ui:", err.Error())
 		return
 	}
+
+	rand.Seed(time.Now().UnixNano())
+
+	f, err := os.Open("ui.png")
+	if err != nil {
+		fmt.Println("failed to open ui.png", err.Error())
+		return
+	}
+
+	img, err := ui.NewImage("ui", f, ebiten.FilterDefault)
+	if err != nil {
+		fmt.Println("failed to add newImage", err.Error())
+		f.Close()
+		return
+	}
+	f.Close()
+
+	f, err = os.Open("ui.aseprite-data")
+	if err != nil {
+		fmt.Println("failed", err)
+		return
+	}
+	defer f.Close()
+	r := aseprite.NewReader(f)
+	slices, err := r.ReadAll()
+	if err != nil {
+		fmt.Println("failed read", err)
+		return
+	}
+	for _, slice := range slices {
+		err = img.AddSlice(slice)
+		if err != nil {
+			fmt.Println("failed to add slice", slice.Name, err)
+			return
+		}
+	}
+
+	_, err = ui.NewButton("btnTest", "global", "Hello!", common.Rect(0, 10, 100, 40), colornames.Blue, "ui", "btnPress", "btnUnpress")
+	if err != nil {
+		fmt.Println("failed to create btnTest", err.Error())
+		return
+	}
 	lblHello, err = ui.NewLabel("lblHello", "Hello, World!", common.Rect(100, 100, 100, 20), colornames.Yellow)
 	if err != nil {
 		fmt.Println("failed to create lblHello", err.Error())
 		return
 	}
-	rand.Seed(time.Now().UnixNano())
-
 	randomBounce()
 	err = ebiten.Run(ui.Update, screenResolution.X, screenResolution.Y, 2, "Complete Example")
 	if err != nil {

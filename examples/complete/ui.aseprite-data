@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sprite id="btnPress">
+    <slices>
+        <slice id="btnPress" color="#0000ff">
+            <key frame="0" x="0" y="0" w="16" h="16" cx="5" cy="5" cw="6" ch="6" px="8" py="8" />
+        </slice>
+        <slice id="btnUnpress" color="#0000ff">
+            <key frame="0" x="16" y="0" w="16" h="16" cx="5" cy="5" cw="6" ch="6" px="8" py="8" />
+        </slice>
+    </slices>
+</sprite>

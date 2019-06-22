@@ -38,7 +38,7 @@ func (u *UI) NewFrame(name string, imageName string, text string, shape *common.
 
 	e = &Frame{
 		name:         name,
-		image:        img,
+		image:        img.ebitenImage,
 		drawRect:     image.Rect(32, 16, 48, 32),
 		shape:        shape,
 		text:         text,
