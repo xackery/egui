@@ -70,12 +70,13 @@ func NewUI(screenResolution image.Point, scale float64) (*UI, error) {
 		textScale:        1,
 		defaultLanguage:  language.AmericanEnglish,
 	}
-	gs := NewScene()
-	u.AddScene("global", gs)
+	gs, err := u.NewScene("global")
+	if err != nil {
+		return nil, err
+	}
 	u.globalScene = gs
 	u.currentScene = gs
-
-	var err error
+	u.lastUpdate = time.Now()
 	u.defaultFont, err = u.NewFontTTF("goregular", goregular.TTF, nil, 'M')
 	if err != nil {
 		return nil, errors.Wrap(err, "goregular font")

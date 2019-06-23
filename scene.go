@@ -15,9 +15,13 @@ type Scene struct {
 }
 
 // NewScene initializes a new scene
-func NewScene() (s *Scene) {
-	s = &Scene{}
-	return
+func (ui *UI) NewScene(name string) (*Scene, error) {
+	s := &Scene{}
+	err := ui.AddScene(name, s)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
 }
 
 // Element returns an element based on name
