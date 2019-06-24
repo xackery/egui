@@ -24,6 +24,7 @@ type Image struct {
 	name        string
 	ebitenImage *ebiten.Image
 	slices      map[string]*Slice
+	animation   *Animation
 }
 
 // Slice represents a 9 slicing instruction set within an image

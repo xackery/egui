@@ -21,7 +21,6 @@ var (
 )
 
 func main() {
-
 	ui, err := egui.NewUI(screenResolution, 1)
 	if err != nil {
 		fmt.Println("failed to start ui:", err.Error())
@@ -51,7 +50,7 @@ func main() {
 	}
 	defer f.Close()
 	r := aseprite.NewReader(f)
-	slices, err := r.ReadAll()
+	slices, err := r.ReadSlices()
 	if err != nil {
 		fmt.Println("failed read", err)
 		return
@@ -64,20 +63,46 @@ func main() {
 		}
 	}
 
-	btnHello, err := ui.NewButton("btnTest", "global", "Hello!", common.Rect(50, 50, 100, 80), color.White, "ui", "btnPress", "btnUnpress")
+	f, err = os.Open("reaper_blade_1.png")
+	if err != nil {
+		fmt.Println("failed", err)
+		return
+	}
+	defer f.Close()
+	_, err = ui.NewImage("reaper", f, ebiten.FilterDefault)
+	if err != nil {
+		fmt.Println("failed", err)
+		return
+	}
+
+	reaper, err := ui.NewSprite("reaper", "global", common.Rect(0, 0, 0, 0), color.White, "reaper")
+	if err != nil {
+		fmt.Println("failed to create sprReaper", err.Error())
+		return
+	}
+
+	btnChange, err := ui.NewButton("btnTest", "global", "Change Direction", common.Rect(50, 50, 180, 80), color.White, "ui", "btnPress", "btnUnpress")
 	if err != nil {
 		fmt.Println("failed to create btnTest", err.Error())
 		return
 	}
-	btnHello.SetOnPressFunction(func() {
-		fmt.Println("pressed", btnHello.Name())
+	lastDirection := 0
+	btnChange.SetOnPressFunction(func() {
+		directions := []string{"down", "left", "up", "right"}
+		lastDirection++
+		if len(directions) < lastDirection+1 {
+			lastDirection = 0
+		}
+
+		reaper.SetAnimation(directions[lastDirection])
 	})
 
-	lblHello, err = ui.NewLabel("lblHello", "Hello, World!", common.Rect(100, 100, 100, 20), colornames.Yellow)
+	lblHello, err = ui.NewLabel("lblHello", "Hello", common.Rect(100, 100, 100, 20), colornames.Yellow)
 	if err != nil {
 		fmt.Println("failed to create lblHello", err.Error())
 		return
 	}
+
 	randomBounce()
 	err = ebiten.Run(ui.Update, screenResolution.X, screenResolution.Y, 2, "Complete Example")
 	if err != nil {
