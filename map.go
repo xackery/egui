@@ -1,7 +1,10 @@
 package egui
 
 import (
+	"fmt"
+	"image"
 	"image/color"
+	"math"
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
@@ -36,14 +39,17 @@ type Map struct {
 
 // MapData contains map related information
 type MapData struct {
-	Source     string        `json:"source,omitempty"`
-	Width      int64         `json:"width,omitempty"`
-	Height     int64         `json:"height,omitempty"`
-	TileWidth  int64         `json:"tile_width,omitempty"`
-	TileHeight int64         `json:"tile_height,omitempty"`
-	TileCount  int64         `json:"tile_count,omitempty"`
-	Layers     []MapLayer    `json:"layers,omitempty"`
-	Colliders  []MapCollider `json:"colliders,omitempty"`
+	Source          string `json:"source,omitempty"`
+	Width           int64  `json:"width,omitempty"`
+	Height          int64  `json:"height,omitempty"`
+	TileWidth       int64  `json:"tile_width,omitempty"`
+	TileHeight      int64  `json:"tile_height,omitempty"`
+	TileCount       int64  `json:"tile_count,omitempty"`
+	TileSheetWidth  int64
+	TileSheetHeight int64
+	TileFrames      []image.Rectangle
+	Layers          []MapLayer    `json:"layers,omitempty"`
+	Colliders       []MapCollider `json:"colliders,omitempty"`
 }
 
 // MapLayer contains layer data
@@ -51,11 +57,6 @@ type MapLayer struct {
 	Name    string    `json:"name,omitempty"`
 	Opacity float32   `json:"opacity,omitempty"`
 	Tiles   []MapTile `json:"tiles,omitempty"`
-}
-
-// MapTile contains the Gid of a specified tile
-type MapTile struct {
-	GID uint32 `json:"gid,omitempty"`
 }
 
 // MapCollider is a boolean if a collider is true or not
@@ -195,6 +196,86 @@ func (e *Map) draw(dst *ebiten.Image) {
 		return
 	}
 
+	var x, y float64
+
+	//for i := len(e.data.Layers) - 1; i >= 0; i-- {
+	for i := 0; i < len(e.data.Layers); i++ {
+		x = 0
+		y = 0
+		l := e.data.Layers[i]
+		/*if filter == "fg" && !strings.Contains(l.Name, "fg") {
+			continue
+		}*/
+		for j := 0; j < len(l.Tiles); j++ {
+			t := l.Tiles[j]
+			if t.Index() == 0 {
+				x += float64(e.data.TileWidth)
+				if x >= float64(e.data.TileSheetWidth) {
+					x = 0
+					y += float64(e.data.TileHeight)
+				}
+				continue
+			}
+
+			op := &ebiten.DrawImageOptions{}
+			h := t.H()
+			v := t.V()
+			d := t.D()
+			if h {
+				switch {
+				case v && d:
+					op.GeoM.Rotate(math.Pi / 2)
+					op.GeoM.Translate(8, 0)
+					op.GeoM.Scale(1.0, -1.0)
+					op.GeoM.Translate(0, 8)
+				case v && !d:
+					op.GeoM.Scale(-1.0, -1.0)
+					op.GeoM.Translate(8, 8)
+				case !v && d:
+					op.GeoM.Rotate(math.Pi / 2)
+					op.GeoM.Translate(8, 0)
+				case !v && !d:
+					op.GeoM.Scale(-1.0, 1.0)
+					op.GeoM.Translate(8, 0)
+				}
+			} else if v {
+				switch {
+				case !h && d:
+					op.GeoM.Rotate(math.Pi / 2)
+					op.GeoM.Translate(8, 0)
+					op.GeoM.Scale(-1.0, -1.0)
+					op.GeoM.Translate(8, 8)
+				case !h && !d:
+					op.GeoM.Scale(1.0, -1.0)
+					op.GeoM.Translate(0, 8)
+				}
+			} else if d {
+				switch {
+				case !v && !h:
+					op.GeoM.Rotate(math.Pi / 2)
+					op.GeoM.Translate(8, 0)
+					op.GeoM.Scale(-1.0, 1.0)
+					op.GeoM.Translate(8, 0)
+				}
+			}
+
+			op.GeoM.Translate(float64(x), float64(y))
+			op.GeoM.Translate(e.X(), e.Y())
+			if len(e.data.TileFrames) < int(t.Index()) {
+				fmt.Println("index out of range:", t.Index(), ">", len(e.data.TileFrames))
+			}
+			r := e.data.TileFrames[t.Index()]
+			op.SourceRect = &r
+			dst.DrawImage(e.image.ebitenImage, op)
+
+			x += float64(e.data.TileWidth)
+			if x >= float64(e.data.TileSheetWidth) {
+				x = 0
+				y += float64(e.data.TileHeight)
+			}
+		}
+	}
+
 	return
 }
 
@@ -258,7 +339,7 @@ func (e *Map) Y() float64 {
 }
 
 // SetData sets a map's data
-func (e *Map) SetData(data *MapData) error {
-	e.data = data
+func (e *Map) SetData(data MapData) error {
+	e.data = &data
 	return nil
 }
