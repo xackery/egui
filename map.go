@@ -16,13 +16,11 @@ import (
 // Map represents a UI Map element
 type Map struct {
 	name            string
-	defaultImage    string
 	image           *Image
 	shape           *common.Rectangle
 	text            string
 	isEnabled       bool
 	isVisible       bool
-	alignment       int
 	isPressed       bool
 	onPressed       func(e *Map)
 	onPressFunction func()
@@ -31,9 +29,6 @@ type Map struct {
 	lerpPosition    *lerpPosition
 	lerpColor       *lerpColor
 	color           color.Color
-	ui              *UI
-	isTextShadow    bool
-	isIdleAnimation bool
 	data            *MapData
 }
 
@@ -118,13 +113,11 @@ func (e *Map) IsEnabled() bool {
 // SetEnabled changes if a map is enabled
 func (e *Map) SetEnabled(isEnabled bool) {
 	e.isEnabled = isEnabled
-	return
 }
 
 // SetVisible changes the visibility of a map
 func (e *Map) SetVisible(isVisible bool) {
 	e.isVisible = isVisible
-	return
 }
 
 // RenderIndex returns the render index of element
@@ -276,7 +269,6 @@ func (e *Map) draw(dst *ebiten.Image) {
 		}
 	}
 
-	return
 }
 
 // SetText changes the text on the map
@@ -319,13 +311,11 @@ func (e *Map) Shape() *common.Rectangle {
 func (e *Map) SetShape(shape common.Rectangle) {
 	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e.shape = &newShape
-	return
 }
 
 // SetIsDestroyed sets an element to be destroyed on next update
 func (e *Map) SetIsDestroyed(isDestroyed bool) {
 	e.isDestroyed = true
-	return
 }
 
 // X returns the X position of a map

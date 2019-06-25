@@ -94,7 +94,7 @@ func main() {
 			lastDirection = 0
 		}
 
-		reaper.SetAnimation(directions[lastDirection])
+		reaper.SetAnimationName(directions[lastDirection])
 	})
 
 	lblHello, err = ui.NewLabel("lblHello", "Hello", common.Rect(100, 100, 100, 20), colornames.Yellow)

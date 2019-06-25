@@ -49,7 +49,6 @@ type UI struct {
 	scenes           map[string]*Scene
 	currentScene     *Scene
 	globalScene      *Scene
-	currentMap       string
 	screenResolution image.Point
 	images           map[string]*Image
 	fonts            map[string]*Font

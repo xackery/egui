@@ -15,13 +15,11 @@ import (
 // Sprite represents a UI Sprite element
 type Sprite struct {
 	name            string
-	defaultImage    string
 	image           *Image
 	shape           *common.Rectangle
 	text            string
 	isEnabled       bool
 	isVisible       bool
-	alignment       int
 	isPressed       bool
 	onPressed       func(e *Sprite)
 	onPressFunction func()
@@ -30,8 +28,6 @@ type Sprite struct {
 	lerpPosition    *lerpPosition
 	lerpColor       *lerpColor
 	color           color.Color
-	ui              *UI
-	isTextShadow    bool
 	isIdleAnimation bool
 	animation       *Animation
 }
@@ -108,13 +104,11 @@ func (e *Sprite) IsEnabled() bool {
 // SetEnabled changes if a sprite is enabled
 func (e *Sprite) SetEnabled(isEnabled bool) {
 	e.isEnabled = isEnabled
-	return
 }
 
 // SetVisible changes the visibility of a sprite
 func (e *Sprite) SetVisible(isVisible bool) {
 	e.isVisible = isVisible
-	return
 }
 
 // RenderIndex returns the render index of element
@@ -200,6 +194,7 @@ func (e *Sprite) draw(dst *ebiten.Image) {
 
 		ai, ok := anim.Animations[fmt.Sprintf("%d_%s", anim.BundleIndex, anim.CurrentName)]
 		if !ok {
+			fmt.Println("anim not found")
 			//TODO: add a buffer for recent errors
 			return
 		}
@@ -207,6 +202,7 @@ func (e *Sprite) draw(dst *ebiten.Image) {
 
 		animData := ai[i]
 		if len(animData) != 2 {
+			fmt.Println("animData not found")
 			//TODO: add a buffer for recent errors
 			return
 		}
@@ -228,7 +224,6 @@ func (e *Sprite) draw(dst *ebiten.Image) {
 	e.shape.Max.X = e.shape.Min.X + anim.CellWidth + float64(pos[4])
 	e.shape.Max.Y = e.shape.Min.Y + anim.CellHeight + float64(pos[5])
 
-	return
 }
 
 // SetText changes the text on the sprite
@@ -271,13 +266,11 @@ func (e *Sprite) Shape() *common.Rectangle {
 func (e *Sprite) SetShape(shape common.Rectangle) {
 	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e.shape = &newShape
-	return
 }
 
 // SetIsDestroyed sets an element to be destroyed on next update
 func (e *Sprite) SetIsDestroyed(isDestroyed bool) {
 	e.isDestroyed = true
-	return
 }
 
 // X returns the X position of a sprite
@@ -347,16 +340,32 @@ func (e *Sprite) generateAnimation() {
 	anim.CellHeight = float64(tileHeight)
 	anim.CurrentName = "down"
 	anim.Speed = 30
-	return
 }
 
-// SetAnimation sets the current animation group name
-func (e *Sprite) SetAnimation(name string) {
+// SetAnimation sets animation data
+func (e *Sprite) SetAnimation(anim Animation) error {
+	e.animation = &Animation{
+		Counter:     anim.Counter,
+		CurrentName: anim.CurrentName,
+		Speed:       anim.Speed,
+		BundleIndex: anim.BundleIndex,
+		CellWidth:   anim.CellWidth,
+		CellHeight:  anim.CellHeight,
+		Image:       anim.Image,
+		Alpha:       anim.Alpha,
+		Clips:       anim.Clips,
+		BundleCount: anim.BundleCount,
+		Animations:  anim.Animations,
+	}
+	return nil
+}
+
+// SetAnimationName sets the current animation group name
+func (e *Sprite) SetAnimationName(name string) {
 	e.animation.CurrentName = name
-	return
 }
 
-// Animation returns the current played animation name
-func (e *Sprite) Animation() string {
+// AnimationName returns the current played animation name
+func (e *Sprite) AnimationName() string {
 	return e.animation.CurrentName
 }

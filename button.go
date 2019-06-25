@@ -15,13 +15,11 @@ import (
 // Button represents a UI Button element
 type Button struct {
 	name               string
-	defaultImage       string
 	image              *Image
 	shape              *common.Rectangle
 	text               string
 	isEnabled          bool
 	isVisible          bool
-	alignment          int
 	isPressed          bool
 	onPressed          func(e *Button)
 	onPressFunction    func()
@@ -33,8 +31,6 @@ type Button struct {
 	font               *Font
 	pressedSliceName   string
 	unpressedSliceName string
-	ui                 *UI
-	isTextShadow       bool
 }
 
 // NewButton creates a new button instance
@@ -93,13 +89,11 @@ func (e *Button) IsEnabled() bool {
 // SetEnabled changes if a button is enabled
 func (e *Button) SetEnabled(isEnabled bool) {
 	e.isEnabled = isEnabled
-	return
 }
 
 // SetVisible changes the visibility of a button
 func (e *Button) SetVisible(isVisible bool) {
 	e.isVisible = isVisible
-	return
 }
 
 // RenderIndex returns the render index of element
@@ -227,7 +221,6 @@ func (e *Button) draw(dst *ebiten.Image) {
 	e.font.DrawText(dst, e.text, tx, ty, e.ui.textScale, 0, c, len([]rune(e.text)))
 	*/
 
-	return
 }
 
 // SetText changes the text on the button
@@ -270,13 +263,11 @@ func (e *Button) Shape() *common.Rectangle {
 func (e *Button) SetShape(shape common.Rectangle) {
 	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e.shape = &newShape
-	return
 }
 
 // SetIsDestroyed sets an element to be destroyed on next update
 func (e *Button) SetIsDestroyed(isDestroyed bool) {
 	e.isDestroyed = true
-	return
 }
 
 // X returns the X position of a button

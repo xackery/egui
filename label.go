@@ -18,7 +18,6 @@ type Label struct {
 	text         string
 	isEnabled    bool
 	isVisible    bool
-	alignment    int
 	lerpPosition *lerpPosition
 	lerpColor    *lerpColor
 	color        color.Color
@@ -74,13 +73,11 @@ func (e *Label) IsEnabled() bool {
 // SetEnabled changes if a button is enabled
 func (e *Label) SetEnabled(isEnabled bool) {
 	e.isEnabled = isEnabled
-	return
 }
 
 // SetVisible changes the visibility of a button
 func (e *Label) SetVisible(isVisible bool) {
 	e.isVisible = isVisible
-	return
 }
 
 // RenderIndex returns the render index of element
@@ -204,11 +201,9 @@ func (e *Label) Shape() *common.Rectangle {
 func (e *Label) SetShape(shape common.Rectangle) {
 	newShape := common.Rect(shape.Min.X, shape.Min.Y, shape.Max.X, shape.Max.Y)
 	e.shape = &newShape
-	return
 }
 
 // SetIsDestroyed sets an element to be destroyed on next update
 func (e *Label) SetIsDestroyed(isDestroyed bool) {
 	e.isDestroyed = true
-	return
 }

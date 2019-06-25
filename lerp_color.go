@@ -26,7 +26,7 @@ func (lc *lerpColor) Lerp() (newColor color.Color) {
 		newColor = lc.endColor
 		return
 	}
-	elapsed := time.Now().Sub(lc.start).Nanoseconds()
+	elapsed := time.Since(lc.start).Nanoseconds()
 	destNano := lc.start.Add(lc.duration).Sub(lc.start).Nanoseconds()
 	t := float64(float64(elapsed) / float64(destNano))
 	aR, aB, aG, aA := lc.startColor.RGBA()

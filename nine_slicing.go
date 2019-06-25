@@ -53,5 +53,4 @@ func DrawNineSlicing(dst, src *ebiten.Image, sliceKey *SliceKey, width int, heig
 			dst.DrawImage(parts[sy*3+sx], op)
 		}
 	}
-	return
 }

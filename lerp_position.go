@@ -26,7 +26,8 @@ func (lc *lerpPosition) Lerp() (x float64, y float64) {
 		lc.isEnabled = false
 		return lc.endPosition.X, lc.endPosition.Y
 	}
-	elapsed := time.Now().Sub(lc.start).Nanoseconds()
+
+	elapsed := time.Since(lc.start).Nanoseconds()
 	destNano := lc.start.Add(lc.duration).Sub(lc.start).Nanoseconds()
 	t := float64(float64(elapsed) / float64(destNano))
 	x = (1-t)*lc.startPosition.X + t*lc.endPosition.X
