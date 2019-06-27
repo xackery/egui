@@ -30,6 +30,7 @@ type Map struct {
 	lerpColor       *lerpColor
 	color           color.Color
 	data            *MapData
+	path            *common.Path
 }
 
 // MapData contains map related information
@@ -86,6 +87,7 @@ func (u *UI) NewMap(name string, scene string, shape common.Rectangle, tintColor
 		color:        tintColor,
 		shape:        &newShape,
 		data:         &MapData{},
+		path:         common.NewPath(),
 	}
 
 	err = s.AddElement(e)
@@ -132,7 +134,6 @@ func (e *Map) SetRenderIndex(renderIndex int64) {
 
 // Update is called during a game update
 func (e *Map) update(dt float64) {
-
 	if e.lerpPosition.isEnabled {
 		e.shape.Min.X, e.shape.Min.Y = e.lerpPosition.Lerp()
 		if !e.lerpPosition.isEnabled {
@@ -147,7 +148,7 @@ func (e *Map) update(dt float64) {
 	}
 
 	isRecentlyPressed := false
-	//mobile and desktop use differnet touch devices
+	//mobile and desktop use different touch devices
 	for _, t := range inpututil.JustPressedTouchIDs() {
 		x, y := ebiten.TouchPosition(t)
 		fx := float64(x)
@@ -328,8 +329,41 @@ func (e *Map) Y() float64 {
 	return e.shape.Min.Y
 }
 
+// TileX converts a egui position to a tile position
+func (e *Map) TileX(x float64) int {
+	if x == 0 {
+		return 0
+	}
+	return int(e.data.TileWidth / int64(x))
+}
+
+// TileY converts a egui position to a tile position
+func (e *Map) TileY(y float64) int {
+	if y == 0 {
+		return 0
+	}
+	return int(e.data.TileHeight / int64(y))
+}
+
 // SetData sets a map's data
 func (e *Map) SetData(data MapData) error {
 	e.data = &data
+	e.path = common.NewPath()
+	x := int(0)
+	y := int(0)
+	for i := 0; i < len(e.data.Colliders); i++ {
+		co := e.data.Colliders[i]
+		e.path.NewNode(x, y, co.IsCollider, float64(co.Cost))
+		x += int(e.data.TileWidth)
+		if x >= int(e.data.TileSheetWidth) {
+			x = 0
+			y += int(e.data.TileHeight)
+		}
+	}
 	return nil
+}
+
+// Route determines a route based on start and end tile poisitions
+func (e *Map) Route(startX, startY, endX, endY int) ([]*common.Edge, error) {
+	return e.path.Route(startX, startY, endX, endY)
 }

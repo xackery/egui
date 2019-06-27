@@ -7,7 +7,7 @@ import (
 
 // Node represents an element in the grid
 type Node struct {
-	X, Y       int8
+	X, Y       int
 	IsCollider bool
 	Cost       float64
 }
@@ -17,12 +17,12 @@ func (n *Node) String() string {
 }
 
 // Heuristic is a euclidean norm
-func (n *Node) Heuristic(goalX, goalY int8) float64 {
+func (n *Node) Heuristic(goalX, goalY int) float64 {
 	return math.Hypot(float64(goalX-n.X), float64(goalY-n.Y))
 }
 
 // Success returns true when we meet a goal
-func (n *Node) Success(goalX, goalY int8) bool {
+func (n *Node) Success(goalX, goalY int) bool {
 	return n.X == goalX && n.Y == goalY
 }
 
