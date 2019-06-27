@@ -60,8 +60,8 @@ func (p *Path) NewNode(ix int, iy int, isCollider bool, cost float64) {
 	return
 }
 
-// Path using astar
-func (p *Path) Path(startX int, startY int, endX int, endY int) (path []*Edge, err error) {
+// Route using astar
+func (p *Path) Route(startX, startY, endX, endY int) (path []*Edge, err error) {
 	if !p.isLoaded {
 		return nil, ErrNoNodesLoaded
 	}
@@ -173,141 +173,9 @@ func (p *Path) Neighbors(nodeX int, nodeY int) (neighbors []*Edge) {
 	return
 }
 
-/*
-// AStar implements an astar pathfinding
-func AStar(start Node, goal Node) []Edge {
-	seen := make(map[Node]bool)
-	openHeap := make(PriorityQueue, 0)
-	heap.Init(&openHeap)
-	cameFrom := make(map[Node]Edge)
-	gScore := make(map[Node]float64)
-	fScore := make(map[Node]float64)
-	gScore[start] = 0
-	fScore[start] = gScore[start] + start.Heuristic(goal)
-	heap.Push(&openHeap, &Item{node: start, priority: fScore[start]})
-	seen[start] = true
-	for {
-		node := heap.Pop(&openHeap).(*Item).node
-		if node.Success(goal) {
-			return reconstructPath(cameFrom, node)
-		}
-		for _, edge := range node.Neighbors() {
-			adj := edge.Dest
-			action := edge.Action
-			if seen[adj] {
-				continue
-			}
-			seen[adj] = true
-			// adjacency cost is based on a constant step
-			gScore[adj] = gScore[node] + 1
-			hScore := adj.Heuristic(goal)
-			fScore[adj] = gScore[adj] + hScore
-			heap.Push(&openHeap, &Item{node: adj, priority: fScore[adj]})
-			// reverse the edge for reconstruction
-			cameFrom[adj] = Edge{
-				Dest:   node,
-				Action: action,
-				score:  fScore[adj],
-			}
-		}
-	}
-}
-*/
-
 func reconstructPath(cameFrom map[int]map[int]*Edge, node *Node) []*Edge {
 	if edge, ok := cameFrom[node.X][node.Y]; ok {
 		return append(reconstructPath(cameFrom, edge.Dest), edge)
 	}
 	return make([]*Edge, 0)
-}
-
-// Route determines a route based on start and end tile poisitions
-func (p *Path) Route(startX, startY, endX, endY int) ([]*Edge, error) {
-	node := p.Node(startX, startY)
-	if node == nil {
-		return nil, fmt.Errorf("invalid starting point")
-	}
-
-	var ok bool
-	seen := make(map[int]map[int]bool)
-	seen[startX] = make(map[int]bool)
-
-	openHeap := make(PriorityQueue, 0)
-	heap.Init(&openHeap)
-	cameFrom := make(map[int]map[int]*Edge)
-
-	gScore := make(map[int]map[int]float64)
-	gScore[startX] = make(map[int]float64)
-	fScore := make(map[int]map[int]float64)
-	fScore[startX] = make(map[int]float64)
-
-	gScore[startX][startY] = node.Cost
-	fScore[startX][startY] = gScore[startX][startY] + node.Heuristic(endX, endY)
-	heap.Push(&openHeap, &Item{node: node, priority: 0})
-
-	seen[startX][startY] = true
-	var item interface{}
-	for {
-		item = heap.Pop(&openHeap)
-		if item == nil {
-			return nil, ErrRouteNotFound
-		}
-		node = item.(*Item).node
-		if node == nil {
-			return nil, ErrRouteNotFound
-		}
-
-		if node.IsCollider {
-			continue
-		}
-		if node.Success(endX, endY) {
-			return reconstructPath(cameFrom, node), nil
-		}
-		for _, edge := range p.Neighbors(node.X, node.Y) {
-			if edge == nil {
-				continue
-			}
-			if edge.Dest == nil {
-				continue
-			}
-			adj := edge.Dest
-			action := edge.Action
-			_, ok = seen[adj.X]
-			if ok && seen[adj.X][adj.Y] {
-				continue
-			}
-			if !ok {
-				seen[adj.X] = make(map[int]bool)
-			}
-			seen[adj.X][adj.Y] = true
-
-			_, ok = gScore[adj.X]
-			if !ok {
-				gScore[adj.X] = make(map[int]float64)
-			}
-			_, ok = fScore[adj.X]
-			if !ok {
-				fScore[adj.X] = make(map[int]float64)
-			}
-			_, ok = cameFrom[adj.X]
-			if !ok {
-				cameFrom[adj.X] = make(map[int]*Edge)
-			}
-			// adjacency cost is based on a constant step
-			adjCost := node.Cost
-			if adjCost == 0 {
-				adjCost = 1
-			}
-			gScore[adj.X][adj.Y] = gScore[node.X][node.Y] + adjCost
-			hScore := adj.Heuristic(endX, endY)
-			fScore[adj.X][adj.Y] = gScore[adj.X][adj.Y] + hScore
-			heap.Push(&openHeap, &Item{node: adj, priority: fScore[adj.X][adj.Y]})
-			// reverse the edge for reconstruction
-			cameFrom[adj.X][adj.Y] = &Edge{
-				Dest:   node,
-				Action: action,
-				score:  fScore[adj.X][adj.Y],
-			}
-		}
-	}
 }
