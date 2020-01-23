@@ -1,0 +1,23 @@
+{ "frames": {
+   "ui.ase": {
+    "frame": { "x": 0, "y": 0, "w": 128, "h": 128 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.16.3",
+  "format": "I8",
+  "size": { "w": 128, "h": 128 },
+  "scale": "1",
+  "slices": [
+   { "name": "btnPress", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 0, "y": 0, "w": 16, "h": 16 }, "center": {"x": 5, "y": 5, "w": 6, "h": 6 }, "pivot": {"x": 8, "y": 8 } }] },
+   { "name": "btnUnpress", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 16, "y": 0, "w": 16, "h": 16 }, "center": {"x": 5, "y": 5, "w": 6, "h": 6 }, "pivot": {"x": 8, "y": 8 } }] },
+   { "name": "card", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 32, "y": 0, "w": 16, "h": 16 }, "center": {"x": 4, "y": 4, "w": 8, "h": 8 }, "pivot": {"x": 8, "y": 8 } }] }
+  ]
+ }
+}

@@ -179,15 +179,15 @@ func (e *Sprite) Update(dt float64) {
 }
 
 // Draw is called during a game update
-func (e *Sprite) Draw(dst *ebiten.Image) {
+func (e *Sprite) Draw(screen *ebiten.Image) {
 	if !e.isVisible {
 		return
 	}
 	anim := e.animation
 
-	op := &ebiten.DrawImageOptions{}
 	//opacity := uint8(255)
 
+	op.GeoM.Reset()
 	if !e.isEnabled {
 		op.ColorM.ChangeHSV(0, 0, 1)
 		op.ColorM.Scale(0.5, 0.5, 0.5, 1)
@@ -221,7 +221,7 @@ func (e *Sprite) Draw(dst *ebiten.Image) {
 	op.GeoM.Scale(e.scale, e.scale)
 
 	if !e.isAnimated {
-		dst.DrawImage(e.image.ebitenImage, op)
+		screen.DrawImage(e.image.ebitenImage, op)
 		return
 	}
 
@@ -230,13 +230,11 @@ func (e *Sprite) Draw(dst *ebiten.Image) {
 		return
 	}
 	r := image.Rect(pos[0], pos[1], pos[2], pos[3])
-	op.SourceRect = &r
 	op.GeoM.Translate(float64(pos[4]), float64(pos[5]))
 
-	dst.DrawImage(e.image.ebitenImage, op)
+	screen.DrawImage(e.image.ebitenImage.SubImage(r).(*ebiten.Image), op)
 	e.shape.Max.X = e.shape.Min.X + anim.CellWidth + float64(pos[4])
 	e.shape.Max.Y = e.shape.Min.Y + anim.CellHeight + float64(pos[5])
-
 }
 
 // SetText changes the text on the sprite

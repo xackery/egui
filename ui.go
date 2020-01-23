@@ -41,6 +41,8 @@ var (
 	ErrSceneAlreadyExists = fmt.Errorf("scene already exists")
 	// ErrSceneNotFound is returned when a scene is not loaded into the UI
 	ErrSceneNotFound = fmt.Errorf("scene not found")
+
+	op = &ebiten.DrawImageOptions{}
 )
 
 // UI contains core game components

@@ -29,7 +29,7 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	f, err := os.Open("ui.png")
+	f, err := os.Open("ui-base-01.png")
 	if err != nil {
 		fmt.Println("failed to open ui.png", err.Error())
 		return
@@ -43,7 +43,7 @@ func main() {
 	}
 	f.Close()
 
-	f, err = os.Open("ui.aseprite-data")
+	f, err = os.Open("ui.json")
 	if err != nil {
 		fmt.Println("failed", err)
 		return
