@@ -12,7 +12,7 @@ import (
 	"github.com/xackery/egui/common"
 )
 
-// Sprite represents a UI Sprite element
+// Sprite represents a UI Sprite element. It contains animation data
 type Sprite struct {
 	name            string
 	image           *Image
@@ -30,6 +30,8 @@ type Sprite struct {
 	color           color.Color
 	isIdleAnimation bool
 	animation       *Animation
+	scale           float64
+	isAnimated      bool
 }
 
 // Animation handles animation details
@@ -76,6 +78,8 @@ func (u *UI) NewSprite(name string, scene string, shape common.Rectangle, tintCo
 		lerpColor:    &lerpColor{},
 		color:        tintColor,
 		shape:        &newShape,
+		scale:        1,
+		isAnimated:   true,
 	}
 	e.generateAnimation()
 
@@ -189,28 +193,37 @@ func (e *Sprite) draw(dst *ebiten.Image) {
 		op.ColorM.Scale(0.5, 0.5, 0.5, 1)
 	}
 	var pos []int
-	if !e.isIdleAnimation {
-		anim.Counter++
+	if e.isAnimated {
+		if !e.isIdleAnimation {
+			anim.Counter++
 
-		ai, ok := anim.Animations[fmt.Sprintf("%d_%s", anim.BundleIndex, anim.CurrentName)]
-		if !ok {
-			fmt.Println("anim not found")
-			//TODO: add a buffer for recent errors
-			return
-		}
-		i := (anim.Counter / anim.Speed) % len(ai)
+			ai, ok := anim.Animations[fmt.Sprintf("%d_%s", anim.BundleIndex, anim.CurrentName)]
+			if !ok {
+				fmt.Println("anim not found")
+				//TODO: add a buffer for recent errors
+				return
+			}
+			i := (anim.Counter / anim.Speed) % len(ai)
 
-		animData := ai[i]
-		if len(animData) != 2 {
-			fmt.Println("animData not found")
-			//TODO: add a buffer for recent errors
-			return
+			animData := ai[i]
+			if len(animData) != 2 {
+				fmt.Println("animData not found")
+				//TODO: add a buffer for recent errors
+				return
+			}
+			pos = anim.Clips[int(animData[0])]
+		} else {
+			//TODO: idle animation data
 		}
-		pos = anim.Clips[int(animData[0])]
 	}
 
 	op.GeoM.Translate(e.X(), e.Y())
-	op.GeoM.Scale(1, 1)
+	op.GeoM.Scale(e.scale, e.scale)
+
+	if !e.isAnimated {
+		dst.DrawImage(e.image.ebitenImage, op)
+		return
+	}
 
 	if len(pos) != 6 {
 		//TODO: add a buffer for recent errors
@@ -294,6 +307,9 @@ func (e *Sprite) generateAnimation() {
 
 	bounds := e.image.ebitenImage.Bounds()
 	if bounds.Dx() < 26 || bounds.Dy() < 36 {
+		if len(e.image.slices) == 0 {
+			e.isAnimated = false
+		}
 		return
 	}
 	tileWidth := bounds.Max.X / 3
@@ -368,4 +384,24 @@ func (e *Sprite) SetAnimationName(name string) {
 // AnimationName returns the current played animation name
 func (e *Sprite) AnimationName() string {
 	return e.animation.CurrentName
+}
+
+// SetScale sets the scale of a sprite
+func (e *Sprite) SetScale(scale float64) {
+	e.scale = scale
+}
+
+// Scale returns the scale of a sprite. default 1
+func (e *Sprite) Scale() float64 {
+	return e.scale
+}
+
+// SetIsAnimated flags if the animation information should be honored or not
+func (e *Sprite) SetIsAnimated(isAnimated bool) {
+	e.isAnimated = isAnimated
+}
+
+// IsAnimated returns true if the sprite is considered an animation
+func (e *Sprite) IsAnimated() bool {
+	return e.isAnimated
 }

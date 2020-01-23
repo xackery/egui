@@ -12,7 +12,9 @@ import (
 	"golang.org/x/image/font"
 )
 
-// Button represents a UI Button element
+// Button represents a UI clickable 9slice ui button.
+// A button has text
+// A button can register events on click
 type Button struct {
 	name               string
 	image              *Image

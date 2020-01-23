@@ -9,15 +9,15 @@ import (
 // DrawNineSlicing will render slicing data
 func DrawNineSlicing(dst, src *ebiten.Image, sliceKey *SliceKey, width int, height int, geoM *ebiten.GeoM, colorM *ebiten.ColorM) {
 
-	partX := int(sliceKey.CX)
-	partY := int(sliceKey.CY)
+	partX := int(sliceKey.Center.X)
+	partY := int(sliceKey.Center.Y)
 
 	parts := make([]*ebiten.Image, 9)
 
 	for j := 0; j < 3; j++ {
 		for i := 0; i < 3; i++ {
-			x := i*partX + int(sliceKey.X)
-			y := j*partY + int(sliceKey.Y)
+			x := i*partX + int(sliceKey.Bounds.X)
+			y := j*partY + int(sliceKey.Bounds.Y)
 			parts[j*3+i] = src.SubImage(image.Rect(x, y, x+partX, y+partY)).(*ebiten.Image)
 		}
 	}

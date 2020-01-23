@@ -255,8 +255,9 @@ func (e *Map) draw(dst *ebiten.Image) {
 
 			op.GeoM.Translate(float64(x), float64(y))
 			op.GeoM.Translate(e.X(), e.Y())
-			if len(e.data.TileFrames) < int(t.Index()) {
-				fmt.Println("index out of range:", t.Index(), ">", len(e.data.TileFrames))
+			if len(e.data.TileFrames) <= int(t.Index()) {
+				fmt.Println("index out of range for", x, y, t.Index(), ">", len(e.data.TileFrames))
+				continue
 			}
 			r := e.data.TileFrames[t.Index()]
 			op.SourceRect = &r

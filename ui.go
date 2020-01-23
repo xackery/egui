@@ -230,12 +230,17 @@ func (u *UI) Font(name string) (*Font, error) {
 }
 
 // RemoveFont is used to unload and remove a font
-func (u *UI) RemoveFont(font *Font) error {
-	if font == nil {
+func (u *UI) RemoveFont(name string) error {
+	if len(name) < 1 {
 		return ErrFontNameInvalid
 	}
-	if u.defaultFont.Name == font.Name {
+	_, ok := u.fonts[name]
+	if !ok {
+		return ErrFontNotFound
+	}
+	if u.defaultFont.Name == name {
 		return ErrFontCannotRemoveDefault
 	}
+	delete(u.fonts, name)
 	return nil
 }

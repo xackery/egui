@@ -11,7 +11,8 @@ import (
 	"github.com/hajimehoshi/ebiten/text"
 )
 
-// Label represents a UI label element
+// Label represents a UI rendered text element.
+// Supports: Text
 type Label struct {
 	name         string
 	shape        *common.Rectangle
@@ -206,4 +207,14 @@ func (e *Label) SetShape(shape common.Rectangle) {
 // SetIsDestroyed sets an element to be destroyed on next update
 func (e *Label) SetIsDestroyed(isDestroyed bool) {
 	e.isDestroyed = true
+}
+
+// SetFont sets the font to provided value
+func (e *Label) SetFont(font *Font) {
+	e.font = font
+}
+
+// Font returns the currently set font
+func (e *Label) Font() *Font {
+	return e.font
 }

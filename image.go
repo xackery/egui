@@ -19,33 +19,13 @@ var (
 	// ErrFontNameInvalid is returned when a font name has invalid characters or too short
 )
 
-// Image represents a ebiten image with added details on how to render
+// Image is a base type representing a nebiten image with added details on how to render.
+// An image is not rendered, instead placed into a cache
 type Image struct {
 	name        string
 	ebitenImage *ebiten.Image
 	slices      map[string]*Slice
 	animation   *Animation
-}
-
-// Slice represents a 9 slicing instruction set within an image
-type Slice struct {
-	Name string      `xml:"id,attr"`
-	Keys []*SliceKey `xml:"key"`
-}
-
-// SliceKey represents each slice's key data
-type SliceKey struct {
-	Frame  string  `xml:"frame,attr"`
-	X      float64 `xml:"x,attr"`
-	Y      float64 `xml:"y,attr"`
-	W      float64 `xml:"w,attr"`
-	H      float64 `xml:"h,attr"`
-	CX     float64 `xml:"cx,attr"`
-	CY     float64 `xml:"cy,attr"`
-	CW     float64 `xml:"cw,attr"`
-	CH     float64 `xml:"ch,attr"`
-	PivotX float64 `xml:"px,attr"`
-	PivotY float64 `xml:"py,attr"`
 }
 
 // NewImage adds a new image to egui

@@ -7,7 +7,7 @@ import (
 	"github.com/xackery/egui/common"
 )
 
-// Interfacer is a generic user interface wrapper
+// Interfacer wraps all user interface elements is a generic user interface wrapper
 type Interfacer interface {
 	//TargetPositionUpdate(tp *common.Vector, duration time.Duration)
 	IsEnabled() bool
