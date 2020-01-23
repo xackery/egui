@@ -13,7 +13,7 @@ import (
 	"github.com/xackery/egui/common"
 )
 
-// Map represents a UI Map element
+// Map represents a UI Map element.
 type Map struct {
 	name            string
 	image           *Image
@@ -26,8 +26,8 @@ type Map struct {
 	onPressFunction func()
 	renderIndex     int64
 	isDestroyed     bool
-	lerpPosition    *lerpPosition
-	lerpColor       *lerpColor
+	lerpPosition    *LerpPosition
+	lerpColor       *LerpColor
 	color           color.Color
 	data            *MapData
 	path            *common.Path
@@ -82,8 +82,8 @@ func (u *UI) NewMap(name string, scene string, shape common.Rectangle, tintColor
 		image:        img,
 		isEnabled:    true,
 		isVisible:    true,
-		lerpPosition: &lerpPosition{},
-		lerpColor:    &lerpColor{},
+		lerpPosition: &LerpPosition{},
+		lerpColor:    &LerpColor{},
 		color:        tintColor,
 		shape:        &newShape,
 		data:         &MapData{},
@@ -133,7 +133,7 @@ func (e *Map) SetRenderIndex(renderIndex int64) {
 }
 
 // Update is called during a game update
-func (e *Map) update(dt float64) {
+func (e *Map) Update(dt float64) {
 	if e.lerpPosition.isEnabled {
 		e.shape.Min.X, e.shape.Min.Y = e.lerpPosition.Lerp()
 		if !e.lerpPosition.isEnabled {
@@ -185,7 +185,7 @@ func (e *Map) update(dt float64) {
 }
 
 // Draw is called during a game update
-func (e *Map) draw(dst *ebiten.Image) {
+func (e *Map) Draw(dst *ebiten.Image) {
 	if !e.isVisible {
 		return
 	}

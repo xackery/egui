@@ -100,3 +100,13 @@ func (img *Image) RemoveSlice(s *Slice) error {
 func (img *Image) Name() string {
 	return img.name
 }
+
+// EbitenImage returns the ebiten image
+func (img *Image) EbitenImage() *ebiten.Image {
+	return img.ebitenImage
+}
+
+// Slices return image slice info
+func (img *Image) Slices() map[string]*Slice {
+	return img.slices
+}

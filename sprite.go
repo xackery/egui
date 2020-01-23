@@ -25,8 +25,8 @@ type Sprite struct {
 	onPressFunction func()
 	renderIndex     int64
 	isDestroyed     bool
-	lerpPosition    *lerpPosition
-	lerpColor       *lerpColor
+	lerpPosition    *LerpPosition
+	lerpColor       *LerpColor
 	color           color.Color
 	isIdleAnimation bool
 	animation       *Animation
@@ -74,8 +74,8 @@ func (u *UI) NewSprite(name string, scene string, shape common.Rectangle, tintCo
 		image:        img,
 		isEnabled:    true,
 		isVisible:    true,
-		lerpPosition: &lerpPosition{},
-		lerpColor:    &lerpColor{},
+		lerpPosition: &LerpPosition{},
+		lerpColor:    &LerpColor{},
 		color:        tintColor,
 		shape:        &newShape,
 		scale:        1,
@@ -126,7 +126,7 @@ func (e *Sprite) SetRenderIndex(renderIndex int64) {
 }
 
 // Update is called during a game update
-func (e *Sprite) update(dt float64) {
+func (e *Sprite) Update(dt float64) {
 
 	if e.lerpPosition.isEnabled {
 		e.shape.Min.X, e.shape.Min.Y = e.lerpPosition.Lerp()
@@ -179,7 +179,7 @@ func (e *Sprite) update(dt float64) {
 }
 
 // Draw is called during a game update
-func (e *Sprite) draw(dst *ebiten.Image) {
+func (e *Sprite) Draw(dst *ebiten.Image) {
 	if !e.isVisible {
 		return
 	}

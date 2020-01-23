@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// lerpColor handles color lerp interpolations
-type lerpColor struct {
+// LerpColor handles color lerp interpolations
+type LerpColor struct {
 	start       time.Time
 	duration    time.Duration
 	startColor  color.Color
@@ -16,7 +16,8 @@ type lerpColor struct {
 	isDestroyed bool
 }
 
-func (lc *lerpColor) Lerp() (newColor color.Color) {
+// Lerp returns a color
+func (lc *LerpColor) Lerp() (newColor color.Color) {
 	if !lc.enabled {
 		newColor = color.White
 		return

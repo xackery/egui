@@ -129,26 +129,26 @@ func (u *UI) Update(image *ebiten.Image) error {
 		return nil
 	}
 
-	u.draw(image)
+	u.Draw(image)
 	return nil
 }
 
 func (u *UI) onUpdate(dt float64) {
 	if u.globalScene != nil {
-		u.globalScene.update(dt)
+		u.globalScene.Update(dt)
 	}
 	if u.currentScene != nil {
-		u.currentScene.update(dt)
+		u.currentScene.Update(dt)
 	}
 }
 
 // Draw renders all UI elements
-func (u *UI) draw(screen *ebiten.Image) {
+func (u *UI) Draw(screen *ebiten.Image) {
 	if u.currentScene != nil {
-		u.currentScene.draw(screen)
+		u.currentScene.Draw(screen)
 	}
 	if u.globalScene != nil {
-		u.globalScene.draw(screen)
+		u.globalScene.Draw(screen)
 	}
 }
 

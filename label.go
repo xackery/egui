@@ -19,8 +19,8 @@ type Label struct {
 	text         string
 	isEnabled    bool
 	isVisible    bool
-	lerpPosition *lerpPosition
-	lerpColor    *lerpColor
+	lerpPosition *LerpPosition
+	lerpColor    *LerpColor
 	color        color.Color
 
 	isDestroyed     bool
@@ -44,8 +44,8 @@ func (u *UI) NewLabel(name string, text string, shape common.Rectangle, color co
 		text:         text,
 		isEnabled:    true,
 		isVisible:    true,
-		lerpPosition: &lerpPosition{},
-		lerpColor:    &lerpColor{},
+		lerpPosition: &LerpPosition{},
+		lerpColor:    &LerpColor{},
 		color:        color,
 		font:         u.defaultFont,
 	}
@@ -91,7 +91,8 @@ func (e *Label) SetRenderIndex(renderIndex int64) {
 	e.renderIndex = renderIndex
 }
 
-func (e *Label) update(dt float64) {
+// Update is called during a frame update
+func (e *Label) Update(dt float64) {
 	if e.lerpColor.enabled {
 		e.color = e.lerpColor.Lerp()
 		if !e.lerpColor.enabled {
@@ -142,7 +143,8 @@ func (e *Label) update(dt float64) {
 	}
 }
 
-func (e *Label) draw(dst *ebiten.Image) {
+// Draw renders on a destination image
+func (e *Label) Draw(dst *ebiten.Image) {
 
 	//bounds, _ := font.BoundString(uiInstance.font, e.text)
 	//w := float64((bounds.Max.X - bounds.Min.X).Ceil())

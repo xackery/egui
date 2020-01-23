@@ -14,8 +14,8 @@ type Interfacer interface {
 	SetEnabled(isEnabled bool)
 	IsVisible() bool
 	SetVisible(isVisible bool)
-	update(dt float64)
-	draw(screen *ebiten.Image)
+	Update(dt float64)
+	Draw(screen *ebiten.Image)
 	Name() string
 	RenderIndex() int64
 	SetRenderIndex(renderIndex int64)

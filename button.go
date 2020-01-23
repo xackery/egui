@@ -27,8 +27,8 @@ type Button struct {
 	onPressFunction    func()
 	renderIndex        int64
 	isDestroyed        bool
-	lerpPosition       *lerpPosition
-	lerpColor          *lerpColor
+	lerpPosition       *LerpPosition
+	lerpColor          *LerpColor
 	color              color.Color
 	font               *Font
 	pressedSliceName   string
@@ -57,8 +57,8 @@ func (u *UI) NewButton(name string, scene string, text string, shape common.Rect
 		text:               text,
 		isEnabled:          true,
 		isVisible:          true,
-		lerpPosition:       &lerpPosition{},
-		lerpColor:          &lerpColor{},
+		lerpPosition:       new(LerpPosition),
+		lerpColor:          new(LerpColor),
 		color:              textColor,
 		shape:              &newShape,
 		font:               u.defaultFont,
@@ -109,7 +109,7 @@ func (e *Button) SetRenderIndex(renderIndex int64) {
 }
 
 // Update is called during a game update
-func (e *Button) update(dt float64) {
+func (e *Button) Update(dt float64) {
 
 	if e.lerpPosition.isEnabled {
 		e.shape.Min.X, e.shape.Min.Y = e.lerpPosition.Lerp()
@@ -162,7 +162,7 @@ func (e *Button) update(dt float64) {
 }
 
 // Draw is called during a game update
-func (e *Button) draw(dst *ebiten.Image) {
+func (e *Button) Draw(dst *ebiten.Image) {
 	if !e.isVisible {
 		return
 	}

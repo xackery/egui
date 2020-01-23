@@ -78,26 +78,28 @@ func (s *Scene) RemoveElement(name string) error {
 	return nil
 }
 
-func (s *Scene) update(dt float64) {
+// Update is called during a frame update
+func (s *Scene) Update(dt float64) {
 	if s.isElementsNextUpdateDirty {
 		s.elements = s.elementsNextUpdate
 		s.isElementsNextUpdateDirty = false
 	}
 
 	for _, e := range s.elements {
-		e.update(dt)
+		e.Update(dt)
 		if e.IsDestroyed() {
 			s.RemoveElement(e.Name())
 		}
 	}
 }
 
-func (s *Scene) draw(screen *ebiten.Image) {
+// Draw renders on a destination image
+func (s *Scene) Draw(screen *ebiten.Image) {
 	for _, e := range s.elements {
 		if !e.IsVisible() {
 			continue
 		}
-		e.draw(screen)
+		e.Draw(screen)
 	}
 }
 
