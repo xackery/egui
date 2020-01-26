@@ -1,4 +1,4 @@
-package egui
+package element
 
 import (
 	"time"
@@ -22,9 +22,5 @@ type Interfacer interface {
 	IsDestroyed() bool
 	SetIsDestroyed(isDestroyed bool)
 	SetText(text string)
-	// Shape returns the shape of an element
-	Shape() *common.Rectangle
-	// SetShape sets the shape of an element
-	SetShape(shape common.Rectangle)
 	LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func())
 }

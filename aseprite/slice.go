@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/xackery/egui"
+	"github.com/xackery/egui/common"
 )
 
 // ReadSlices reads slice data
-func (r *Reader) ReadSlices() (slices map[string]*egui.Slice, err error) {
+func (r *Reader) ReadSlices() (slices map[string]*common.Slice, err error) {
 	jr := json.NewDecoder(r.r)
 
 	sp := struct {
@@ -16,7 +16,7 @@ func (r *Reader) ReadSlices() (slices map[string]*egui.Slice, err error) {
 			Slices []struct {
 				Name  string
 				Color string
-				Keys  []egui.SliceKey
+				Keys  []common.SliceKey
 			}
 		}
 	}{}
@@ -25,14 +25,14 @@ func (r *Reader) ReadSlices() (slices map[string]*egui.Slice, err error) {
 	if err != nil {
 		return
 	}
-	slices = make(map[string]*egui.Slice)
+	slices = make(map[string]*common.Slice)
 	for _, s := range sp.Meta.Slices {
-		slice := new(egui.Slice)
+		slice := new(common.Slice)
 		slice.Name = s.Name
 
 		for _, k := range s.Keys {
 
-			/*key := new(egui.SliceKey)
+			/*key := new(common.SliceKey)
 			key.CX = float64(k.Center.X)
 			key.CX = float64(k.Center.Y)
 			key.CH = float64(k.Center.W)

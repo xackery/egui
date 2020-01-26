@@ -1,4 +1,4 @@
-package egui
+package common
 
 import (
 	"image"
@@ -8,7 +8,6 @@ import (
 
 // DrawNineSlicing will render slicing data
 func DrawNineSlicing(dst, src *ebiten.Image, sliceKey *SliceKey, width int, height int, geoM *ebiten.GeoM, colorM *ebiten.ColorM) {
-
 	partX := int(sliceKey.Center.X)
 	partY := int(sliceKey.Center.Y)
 
@@ -33,8 +32,10 @@ func DrawNineSlicing(dst, src *ebiten.Image, sliceKey *SliceKey, width int, heig
 		case 0:
 			sy = 0
 		case yn - 1:
+			//bottom
 			sy = 2
 		default:
+			//top
 			sy = 1
 		}
 		for i := 0; i < xn; i++ {
@@ -43,8 +44,10 @@ func DrawNineSlicing(dst, src *ebiten.Image, sliceKey *SliceKey, width int, heig
 			case 0:
 				sx = 0
 			case xn - 1:
+				//right center
 				sx = 2
 			default:
+				//center
 				sx = 1
 			}
 			op.GeoM.Reset()

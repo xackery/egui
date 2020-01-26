@@ -1,7 +1,6 @@
 package egui
 
 import (
-	"fmt"
 	"image"
 	"time"
 
@@ -10,50 +9,24 @@ import (
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/pkg/errors"
+	"github.com/xackery/egui/common"
 	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/text/language"
 )
 
 var (
-	// ErrElementNameInvalid is returned when a element name has invalid characters or too short
-	ErrElementNameInvalid = fmt.Errorf("element name invalid")
-	// ErrElementAlreadyExists is returned when a element already exists
-	ErrElementAlreadyExists = fmt.Errorf("element already exists")
-	// ErrElementNotFound is returned when a element is not loaded into the UI
-	ErrElementNotFound = fmt.Errorf("element not found")
-	// ErrFontNameInvalid is returned when a font name has invalid characters or too short
-	ErrFontNameInvalid = fmt.Errorf("font name invalid")
-	// ErrFontAlreadyExists is returned when a font already exists
-	ErrFontAlreadyExists = fmt.Errorf("font already exists")
-	// ErrFontNotFound is returned when a font was not found
-	ErrFontNotFound = fmt.Errorf("font not found")
-	// ErrFontCannotRemoveDefault is returned when you attempt to delete a font currently set as default
-	ErrFontCannotRemoveDefault = fmt.Errorf("font is default, cannot remove")
-	// ErrImageNameInvalid is returned when a image name has invalid characters or too short
-	ErrImageNameInvalid = fmt.Errorf("image name invalid")
-	// ErrImageAlreadyExists is returned when a image already exists
-	ErrImageAlreadyExists = fmt.Errorf("image already exists")
-	// ErrImageNotFound is returned when a image was not found
-	ErrImageNotFound = fmt.Errorf("image not found")
-	// ErrSceneNameInvalid is returned when a scene name has invalid characters or too short
-	ErrSceneNameInvalid = fmt.Errorf("scene name invalid")
-	// ErrSceneAlreadyExists is returned when a Scene already exists
-	ErrSceneAlreadyExists = fmt.Errorf("scene already exists")
-	// ErrSceneNotFound is returned when a scene is not loaded into the UI
-	ErrSceneNotFound = fmt.Errorf("scene not found")
-
 	op = &ebiten.DrawImageOptions{}
 )
 
 // UI contains core game components
 type UI struct {
-	defaultFont      *Font
+	defaultFont      *common.Font
 	scenes           map[string]*Scene
 	currentScene     *Scene
 	globalScene      *Scene
 	screenResolution image.Point
-	images           map[string]*Image
-	fonts            map[string]*Font
+	images           map[string]*common.Image
+	fonts            map[string]*common.Font
 	lastUpdate       time.Time
 	tileScale        float64
 	textScale        float64
@@ -64,8 +37,8 @@ type UI struct {
 func NewUI(screenResolution image.Point, scale float64) (*UI, error) {
 	u := &UI{
 		scenes:           make(map[string]*Scene),
-		images:           make(map[string]*Image),
-		fonts:            make(map[string]*Font),
+		images:           make(map[string]*common.Image),
+		fonts:            make(map[string]*common.Font),
 		screenResolution: screenResolution,
 		tileScale:        1,
 		textScale:        1,
@@ -99,23 +72,23 @@ func (u *UI) Resolution() image.Point {
 }
 
 // AddImage adds an image image to ui
-func (u *UI) AddImage(img *Image) error {
-	if img.Name() == "" {
-		return ErrImageNameInvalid
+func (u *UI) AddImage(img *common.Image) error {
+	if img.Name == "" {
+		return common.ErrImageNameInvalid
 	}
-	_, ok := u.images[img.Name()]
+	_, ok := u.images[img.Name]
 	if ok {
-		return ErrImageAlreadyExists
+		return common.ErrImageAlreadyExists
 	}
-	u.images[img.Name()] = img
+	u.images[img.Name] = img
 	return nil
 }
 
 // Image returns a named image
-func (u *UI) Image(name string) (*Image, error) {
+func (u *UI) Image(name string) (*common.Image, error) {
 	img, ok := u.images[name]
 	if !ok {
-		return nil, ErrImageNotFound
+		return nil, common.ErrImageNotFound
 	}
 	return img, nil
 }
@@ -158,7 +131,7 @@ func (u *UI) Draw(screen *ebiten.Image) {
 func (u *UI) SetCurrentScene(name string) error {
 	s, ok := u.scenes[name]
 	if !ok {
-		return ErrSceneNotFound
+		return common.ErrSceneNotFound
 	}
 	u.currentScene = s
 	return nil
@@ -173,7 +146,7 @@ func (u *UI) CurrentScene() *Scene {
 func (u *UI) AddScene(name string, scene *Scene) error {
 	_, ok := u.scenes[name]
 	if ok {
-		return ErrSceneAlreadyExists
+		return common.ErrSceneAlreadyExists
 	}
 	scene.onResolutionChange(u.screenResolution)
 	u.scenes[name] = scene
@@ -184,7 +157,7 @@ func (u *UI) AddScene(name string, scene *Scene) error {
 func (u *UI) Scene(name string) (*Scene, error) {
 	scene, ok := u.scenes[name]
 	if !ok {
-		return nil, ErrSceneNotFound
+		return nil, common.ErrSceneNotFound
 	}
 	return scene, nil
 }
@@ -193,7 +166,7 @@ func (u *UI) Scene(name string) (*Scene, error) {
 func (u *UI) SetDefaultFont(name string) error {
 	font, ok := u.fonts[name]
 	if !ok {
-		return ErrFontNotFound
+		return common.ErrFontNotFound
 	}
 	u.defaultFont = font
 	return nil
@@ -203,30 +176,30 @@ func (u *UI) SetDefaultFont(name string) error {
 func (u *UI) DefaultFont(name string) error {
 	font, ok := u.fonts[name]
 	if !ok {
-		return ErrFontNotFound
+		return common.ErrFontNotFound
 	}
 	u.defaultFont = font
 	return nil
 }
 
 // AddFont adds an font font to ui
-func (u *UI) AddFont(font *Font) error {
+func (u *UI) AddFont(font *common.Font) error {
 	if font == nil {
-		return ErrFontNameInvalid
+		return common.ErrFontNameInvalid
 	}
 	_, ok := u.fonts[font.Name]
 	if ok {
-		return ErrFontAlreadyExists
+		return common.ErrFontAlreadyExists
 	}
 	u.fonts[font.Name] = font
 	return nil
 }
 
 // Font returns named font
-func (u *UI) Font(name string) (*Font, error) {
+func (u *UI) Font(name string) (*common.Font, error) {
 	img, ok := u.fonts[name]
 	if !ok {
-		return nil, ErrFontNotFound
+		return nil, common.ErrFontNotFound
 	}
 	return img, nil
 }
@@ -234,14 +207,14 @@ func (u *UI) Font(name string) (*Font, error) {
 // RemoveFont is used to unload and remove a font
 func (u *UI) RemoveFont(name string) error {
 	if len(name) < 1 {
-		return ErrFontNameInvalid
+		return common.ErrFontNameInvalid
 	}
 	_, ok := u.fonts[name]
 	if !ok {
-		return ErrFontNotFound
+		return common.ErrFontNotFound
 	}
 	if u.defaultFont.Name == name {
-		return ErrFontCannotRemoveDefault
+		return common.ErrFontCannotRemoveDefault
 	}
 	delete(u.fonts, name)
 	return nil

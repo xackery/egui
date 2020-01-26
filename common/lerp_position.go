@@ -1,17 +1,15 @@
-package egui
+package common
 
 import (
 	"time"
-
-	"github.com/xackery/egui/common"
 )
 
 // LerpPosition handles vector lerp interpolations
 type LerpPosition struct {
 	start         time.Time
-	startPosition *common.Vector
+	startPosition *Vector
 	duration      time.Duration
-	endPosition   *common.Vector
+	endPosition   *Vector
 	endFunc       func()
 	isEndFuncSet  bool
 	isDestroyed   bool
@@ -74,7 +72,7 @@ func (lc *LerpPosition) IsEndFuncSet() bool {
 }
 
 // Init sets up a new lerp
-func (lc *LerpPosition) Init(start time.Time, startPosition *common.Vector, endPosition *common.Vector, duration time.Duration, isEnabled bool, endFunc func(), isDestroyedAtEnd bool) {
+func (lc *LerpPosition) Init(start time.Time, startPosition *Vector, endPosition *Vector, duration time.Duration, isEnabled bool, endFunc func(), isDestroyedAtEnd bool) {
 	lc.start = time.Now()
 	lc.startPosition = startPosition
 	lc.endPosition = endPosition

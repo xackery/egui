@@ -12,11 +12,12 @@ import (
 	"github.com/xackery/egui"
 	"github.com/xackery/egui/aseprite"
 	"github.com/xackery/egui/common"
+	"github.com/xackery/egui/element/label"
 	"golang.org/x/image/colornames"
 )
 
 var (
-	lblHello         egui.Interfacer
+	lblHello         *label.Element
 	screenResolution = image.Point{X: 320, Y: 240}
 )
 
@@ -75,13 +76,13 @@ func main() {
 		return
 	}
 
-	reaper, err := ui.NewSprite("reaper", "global", common.Rect(0, 0, 0, 0), color.White, "reaper")
+	reaper, err := ui.NewSprite("reaper", "global", 0, 0, "reaper")
 	if err != nil {
 		fmt.Println("failed to create sprReaper", err.Error())
 		return
 	}
 
-	btnChange, err := ui.NewButton("btnTest", "global", "Change Direction", common.Rect(50, 50, 180, 80), color.White, "ui", "btnPress", "btnUnpress")
+	btnChange, err := ui.NewButton("btnTest", "global", "Change Direction", 50, 50, 150, 30, color.White, "btnPress", "btnUnpress")
 	if err != nil {
 		fmt.Println("failed to create btnTest", err.Error())
 		return
@@ -97,7 +98,7 @@ func main() {
 		reaper.SetAnimationName(directions[lastDirection])
 	})
 
-	lblHello, err = ui.NewLabel("lblHello", "Hello", common.Rect(100, 100, 100, 20), colornames.Yellow)
+	lblHello, err = ui.NewLabel("lblHello", "global", "Hello", 100, 100, colornames.Yellow)
 	if err != nil {
 		fmt.Println("failed to create lblHello", err.Error())
 		return
@@ -112,7 +113,8 @@ func main() {
 }
 
 func randomBounce() {
-	x := float64(rand.Intn(screenResolution.X - int(lblHello.Shape().Max.X)))
-	y := float64(rand.Intn(screenResolution.Y - int(lblHello.Shape().Max.Y)))
+
+	x := float64(rand.Intn(screenResolution.X - int(lblHello.Width())))
+	y := float64(rand.Intn(screenResolution.Y - int(lblHello.Height())))
 	lblHello.LerpPosition(common.Vect(x, y), 3*time.Second, false, randomBounce)
 }

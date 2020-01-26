@@ -1,4 +1,4 @@
-package egui
+package common
 
 // Slice represents a 9 slicing instruction set within an image
 type Slice struct {

@@ -1,4 +1,4 @@
-package egui
+package common
 
 import "fmt"
 

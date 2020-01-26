@@ -1,6 +1,10 @@
 package egui
 
-type elements []Interfacer
+import (
+	"github.com/xackery/egui/element"
+)
+
+type elements []element.Interfacer
 
 // Len is part of sort.Interface.
 func (e elements) Len() int {

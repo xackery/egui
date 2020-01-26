@@ -5,6 +5,8 @@ import (
 	"sort"
 
 	"github.com/hajimehoshi/ebiten"
+	"github.com/xackery/egui/common"
+	"github.com/xackery/egui/element"
 )
 
 // Scene represents a layout of ui
@@ -25,9 +27,9 @@ func (ui *UI) NewScene(name string) (*Scene, error) {
 }
 
 // Element returns an element based on name
-func (s *Scene) Element(name string) (Interfacer, error) {
+func (s *Scene) Element(name string) (element.Interfacer, error) {
 	if name == "" {
-		return nil, ErrElementNameInvalid
+		return nil, common.ErrElementNameInvalid
 	}
 	for _, se := range s.elementsNextUpdate {
 		if se.Name() != name {
@@ -35,19 +37,19 @@ func (s *Scene) Element(name string) (Interfacer, error) {
 		}
 		return se, nil
 	}
-	return nil, ErrElementNotFound
+	return nil, common.ErrElementNotFound
 }
 
 // AddElement adds an element to the scene list
-func (s *Scene) AddElement(e Interfacer) error {
+func (s *Scene) AddElement(e element.Interfacer) error {
 	if e.Name() == "" {
-		return ErrElementNotFound
+		return common.ErrElementNotFound
 	}
 	for _, se := range s.elementsNextUpdate {
 		if se.Name() != e.Name() {
 			continue
 		}
-		return ErrElementAlreadyExists
+		return common.ErrElementAlreadyExists
 	}
 	s.elementsNextUpdate = append(s.elementsNextUpdate, e)
 	s.isElementsNextUpdateDirty = true
@@ -58,7 +60,7 @@ func (s *Scene) AddElement(e Interfacer) error {
 // RemoveElement flags an element to be removed next update
 func (s *Scene) RemoveElement(name string) error {
 	if name == "" {
-		return ErrElementNameInvalid
+		return common.ErrElementNameInvalid
 	}
 	var isFound bool
 	for i := range s.elementsNextUpdate {
@@ -71,7 +73,7 @@ func (s *Scene) RemoveElement(name string) error {
 		break
 	}
 	if !isFound {
-		return ErrElementNotFound
+		return common.ErrElementNotFound
 	}
 	sort.Sort(elements(s.elementsNextUpdate))
 	s.isElementsNextUpdateDirty = true
