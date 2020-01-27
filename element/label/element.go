@@ -214,8 +214,8 @@ func (e *Element) IsDestroyed() bool {
 }
 
 // LerpPosition changes an element's position over duration
-func (e *Element) LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func()) {
-	e.lerpPosition.Init(time.Now(), &common.Vector{X: e.x, Y: e.y}, &common.Vector{X: endPosition.X, Y: endPosition.Y}, duration, true, endFunc, isDestroyed)
+func (e *Element) LerpPosition(endPositionX, endPositionY float64, duration time.Duration, isDestroyed bool, endFunc func()) {
+	e.lerpPosition.Init(time.Now(), e.x, e.y, endPositionX, endPositionY, duration, true, endFunc, isDestroyed)
 }
 
 // Position returns an element's position

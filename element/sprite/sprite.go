@@ -186,8 +186,8 @@ func (e *Element) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	op.GeoM.Translate(e.x, e.y)
 	op.GeoM.Scale(e.scale, e.scale)
+	op.GeoM.Translate(e.x, e.y)
 
 	if !e.isAnimated {
 		screen.DrawImage(e.image.EbitenImage, op)
@@ -227,8 +227,8 @@ func (e *Element) IsDestroyed() bool {
 }
 
 // LerpPosition changes an element's position over duration
-func (e *Element) LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func()) {
-	e.lerpPosition.Init(time.Now(), &common.Vector{X: e.x, Y: e.y}, &common.Vector{X: endPosition.X, Y: endPosition.Y}, duration, true, endFunc, isDestroyed)
+func (e *Element) LerpPosition(endPositionX, endPositionY float64, duration time.Duration, isDestroyed bool, endFunc func()) {
+	e.lerpPosition.Init(time.Now(), e.x, e.y, endPositionX, endPositionY, duration, true, endFunc, isDestroyed)
 }
 
 // SetIsDestroyed sets an element to be destroyed on next update
@@ -364,4 +364,34 @@ func (e *Element) SetBundleIndex(index int) error {
 // BundleIndex returns the index sprite rendering
 func (e *Element) BundleIndex() int {
 	return e.animation.BundleIndex
+}
+
+// Width returns an element's width
+func (e *Element) Width() int {
+	return e.width
+}
+
+// SetWidth sets an element's width
+func (e *Element) SetWidth(width int) {
+	e.width = width
+}
+
+// Height returns an element's height
+func (e *Element) Height() int {
+	return e.height
+}
+
+// SetHeight sets an element's height
+func (e *Element) SetHeight(height int) {
+	e.height = height
+}
+
+// CellWidth returns an element's animation cell width
+func (e *Element) CellWidth() int {
+	return int(e.animation.CellHeight)
+}
+
+// CellHeight  returns an element's animation cell height
+func (e *Element) CellHeight() int {
+	return int(e.animation.CellWidth)
 }

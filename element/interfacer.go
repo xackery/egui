@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/xackery/egui/common"
 )
 
 // Interfacer wraps all user interface elements is a generic user interface wrapper
@@ -22,5 +21,5 @@ type Interfacer interface {
 	IsDestroyed() bool
 	SetIsDestroyed(isDestroyed bool)
 	SetText(text string)
-	LerpPosition(endPosition common.Vector, duration time.Duration, isDestroyed bool, endFunc func())
+	LerpPosition(endPositionX, endpositionY float64, duration time.Duration, isDestroyed bool, endFunc func())
 }

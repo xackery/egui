@@ -56,6 +56,5 @@ func (r *Reader) ReadSlices() (slices map[string]*common.Slice, err error) {
 
 		slices[slice.Name] = slice
 	}
-	fmt.Println("slices", slices)
 	return slices, nil
 }
